@@ -124,9 +124,9 @@ CRITICAL RULES: Return ONLY the raw enhanced prompt text. NO markdown formatting
 
     const seed = Math.floor(Math.random() * 1000000);
     
-    // Use mistral model for guaranteed sub-3-second generation speeds
+    // Use openai model mapping (the legacy endpoint defaults to a fast model internally)
     const payload = {
-      model: "mistral", 
+      model: "openai", 
       messages: [
         { role: "system", content: masterPrompt },
         { role: "user", content: request.text }
