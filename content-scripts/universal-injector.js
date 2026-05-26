@@ -8,10 +8,17 @@ function initialize() {
 }
 
 let activeInput = null;
-let inlineBtn = null;
+let btnContainer = null;
 
 function createInlineButton() {
-  if (document.getElementById('pf-universal-inline-btn')) return;
+  if (document.getElementById('pf-inline-btn-container')) return;
+
+  btnContainer = document.createElement('div');
+  btnContainer.id = 'pf-inline-btn-container';
+  btnContainer.style.display = 'none';
+  btnContainer.style.position = 'fixed';
+  btnContainer.style.gap = '8px';
+  btnContainer.style.zIndex = '9999';
 
   inlineBtn = document.createElement('button');
   inlineBtn.id = 'pf-universal-inline-btn';
@@ -19,7 +26,6 @@ function createInlineButton() {
   inlineBtn.innerHTML = '✨ Enhance';
   inlineBtn.title = 'Enhance Prompt (Ctrl+M)';
   inlineBtn.type = 'button';
-  inlineBtn.style.display = 'none';
   
   inlineBtn.addEventListener('click', (e) => {
     e.preventDefault(); e.stopPropagation();
@@ -45,21 +51,45 @@ function createInlineButton() {
       if (tracker) tracker.setValue('');
     });
   });
+
+  const saveBtn = document.createElement('button');
+  saveBtn.id = 'pf-universal-save-btn';
+  saveBtn.className = 'pf-inline-enhance-btn';
+  saveBtn.innerHTML = '💾 Save';
+  saveBtn.title = 'Save to Vault';
+  saveBtn.type = 'button';
   
-  document.body.appendChild(inlineBtn);
+  // Style override for secondary save button
+  saveBtn.style.background = 'rgba(255,255,255,0.1)';
+  saveBtn.style.color = 'white';
+
+  saveBtn.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!activeInput) return;
+    const text = activeInput.value || activeInput.innerText;
+    if (!text.trim()) { alert("PromptFlow Pro: Please type a prompt to save."); return; }
+    
+    saveBtn.innerHTML = '✅ Saved';
+    chrome.runtime.sendMessage({ action: 'save_prompt', text: text }, () => {
+      setTimeout(() => saveBtn.innerHTML = '💾 Save', 2000);
+    });
+  });
+
+  btnContainer.appendChild(saveBtn);
+  btnContainer.appendChild(inlineBtn);
+  document.body.appendChild(btnContainer);
 }
 
 function updateButtonPosition() {
-  if (!inlineBtn || !activeInput) return;
+  if (!btnContainer || !activeInput) return;
   const rect = activeInput.getBoundingClientRect();
   if (rect.width === 0 || rect.height === 0 || rect.top < 0 || rect.bottom > window.innerHeight) {
-    inlineBtn.style.display = 'none';
+    btnContainer.style.display = 'none';
     return;
   }
-  inlineBtn.style.display = 'flex';
-  inlineBtn.style.position = 'fixed';
-  inlineBtn.style.top = (rect.bottom - 46) + 'px';
-  inlineBtn.style.left = (rect.right - 120) + 'px'; 
+  btnContainer.style.display = 'flex';
+  btnContainer.style.top = (rect.bottom - 46) + 'px';
+  btnContainer.style.left = (rect.right - 190) + 'px'; // Adjust for two buttons
 }
 
 const observer = new MutationObserver((mutations) => {
@@ -93,8 +123,9 @@ setInterval(updateButtonPosition, 500);
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'm') {
     e.preventDefault();
-    if (inlineBtn && inlineBtn.style.display !== 'none') {
-      inlineBtn.click();
+    if (btnContainer && btnContainer.style.display !== 'none') {
+      const btn = document.getElementById('pf-universal-inline-btn');
+      if (btn) btn.click();
     }
   }
 });

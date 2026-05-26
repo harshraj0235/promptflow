@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   console.log('PromptFlow Pro Installed');
   // Set up side panel behavior
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(console.error);
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
 
   // Initialize default prompts if empty
   chrome.storage.local.get(['prompts'], (res) => {
@@ -59,6 +59,21 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'save_prompt') {
+    chrome.storage.local.get(['savedPrompts'], (res) => {
+      const prompts = res.savedPrompts || [];
+      if (!prompts.includes(request.text)) {
+        prompts.unshift(request.text);
+        chrome.storage.local.set({ savedPrompts: prompts }, () => {
+          sendResponse({ success: true });
+        });
+      } else {
+        sendResponse({ success: true }); // Already saved
+      }
+    });
+    return true;
+  }
+  
   if (request.action === 'ai_enhance') {
     const masterPrompt = `You are an elite AI Meta-Prompt Engineer.
 
