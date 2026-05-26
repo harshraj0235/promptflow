@@ -111,11 +111,26 @@ Keep the output extremely concise and generate it as fast as possible.`;
       temperature: 0.5
     };
 
-    fetch('https://text.pollinations.ai/openai', {
+    // Robust exponential backoff retry mechanism for million-user scale
+    async function fetchWithRetry(url, options, retries = 3, backoff = 1000) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (res.ok || res.status < 500) return res; // Return success or non-retryable errors immediately
+          if (i === retries - 1) return res;
+        } catch (err) {
+          if (i === retries - 1) throw err;
+        }
+        // Wait before retrying: 1s, then 2s, then 4s
+        await new Promise(r => setTimeout(r, backoff * Math.pow(2, i)));
+      }
+    }
+
+    fetchWithRetry('https://text.pollinations.ai/openai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    })
+    }, 3)
       .then(async res => {
         if (!res.ok) {
            const errText = await res.text();
