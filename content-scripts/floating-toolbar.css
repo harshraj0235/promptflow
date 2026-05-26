@@ -84,3 +84,92 @@
   box-shadow: 0 6px 16px rgba(108, 92, 231, 0.5);
   background: linear-gradient(135deg, #5b4dd1, #9333ea);
 }
+
+/* Universal UI Container */
+.pf-universal-ui-container {
+  pointer-events: none;
+  z-index: 2147483647;
+}
+
+.pf-top-toolbar {
+  pointer-events: auto;
+  display: flex;
+  gap: 16px;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border: 1px solid #e5e7eb;
+}
+@media (prefers-color-scheme: dark) {
+  .pf-top-toolbar {
+    background: #202123;
+    border-color: #343541;
+  }
+}
+
+.pf-tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #3b82f6; 
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.pf-tool-btn span {
+  color: #6b7280;
+}
+@media (prefers-color-scheme: dark) {
+  .pf-tool-btn span { color: #9ca3af; }
+}
+.pf-tool-btn:hover {
+  transform: translateY(-2px);
+}
+.pf-tool-btn:hover span {
+  color: #3b82f6;
+}
+
+.pf-inline-icons {
+  pointer-events: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  .pf-inline-icons {
+    background: transparent;
+  }
+}
+
+.pf-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.pf-icon-btn.pf-logo-btn {
+  font-weight: 800;
+  font-size: 16px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+}
+.pf-icon-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
