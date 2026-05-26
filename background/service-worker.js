@@ -135,9 +135,9 @@ Return ONLY the raw prompt text. DO NOT include any headers like "[Enhanced Prom
 
     const seed = Math.floor(Math.random() * 1000000);
     
-    // Switch to Llama for lightning-fast latency
+    // Use default openai model which maps to the fast production-ready endpoint
     const payload = {
-      model: "llama", 
+      model: "openai", 
       messages: [
         { role: "system", content: masterPrompt },
         { role: "user", content: request.text }
