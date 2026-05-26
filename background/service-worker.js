@@ -84,8 +84,23 @@ Keep the output extremely concise and generate it as fast as possible.
 User's raw input:
 "${request.text}"`;
 
-    fetch('https://text.pollinations.ai/' + encodeURIComponent(masterPrompt))
-      .then(res => res.text())
+    // Append a random seed to prevent caching collisions and handle rate limit queues better
+    const seed = Math.floor(Math.random() * 1000000);
+    const url = 'https://text.pollinations.ai/' + encodeURIComponent(masterPrompt) + '?seed=' + seed;
+    
+    fetch(url)
+      .then(async res => {
+        if (!res.ok) {
+           const errText = await res.text();
+           let errMsg = errText;
+           try {
+             const json = JSON.parse(errText);
+             if (json.error) errMsg = json.error;
+           } catch(e) {}
+           throw new Error(errMsg || `Server returned ${res.status}`);
+        }
+        return res.text();
+      })
       .then(enhancedText => {
         // Strip any residual headers just in case
         let cleanedText = enhancedText
@@ -95,9 +110,10 @@ User's raw input:
         sendResponse({ success: true, text: cleanedText.trim() });
       })
       .catch(err => {
+        console.error("PromptFlow API Error:", err);
         sendResponse({ success: false, error: err.message });
       });
-      
-    return true; // Keep channel open for async response
+
+    return true; // Keep message channel open for async response
   }
 });
