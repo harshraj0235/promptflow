@@ -94,30 +94,64 @@ CRITICAL OUTPUT RULES:
 - Make it immediately usable — paste-ready`;
 
 
+
 // ═══════════════════════════════════════════════════════════════
 // FREE PROVIDER STACK — Auto-failover, zero cost, scales to millions
+// Uses text.pollinations.ai (free, no auth needed)
+// gen.pollinations.ai now requires auth — DO NOT USE for free tier
 // ═══════════════════════════════════════════════════════════════
 
 const FREE_PROVIDERS = [
-  { name: 'GPT-5 Nano',     model: 'openai-fast',  timeout: 8000  },
-  { name: 'Mistral 3.2',    model: 'mistral',      timeout: 10000 },
-  { name: 'DeepSeek V4',    model: 'deepseek',     timeout: 12000 },
-  { name: 'Llama 4 Scout',  model: 'llama-scout',  timeout: 12000 },
-  { name: 'Nova Micro',     model: 'nova-fast',     timeout: 10000 },
+  { name: 'GPT-5 Nano',     model: 'openai-fast',  timeout: 12000 },
+  { name: 'OpenAI',         model: 'openai',       timeout: 15000 },
+  { name: 'Mistral 3.2',    model: 'mistral',      timeout: 15000 },
+  { name: 'DeepSeek V4',    model: 'deepseek',     timeout: 15000 },
+  { name: 'Llama 3.3',      model: 'llama',        timeout: 15000 },
 ];
 
-async function callPollinations(text, model, timeoutMs) {
+// Compact system instruction for GET URL (URL length limit)
+const COMPACT_SYSTEM = `You are an elite prompt engineer. Transform the user's weak prompt into a highly detailed, optimized prompt. Detect intent, add missing details (audience, style, format, constraints), expand with structure (ROLE, TASK, CONTEXT, STYLE, FORMAT, OUTPUT GOAL). For image/video: add SUBJECT, ACTION, ENVIRONMENT, LIGHTING, CAMERA, STYLE, MOOD. Return ONLY the raw enhanced prompt. No markdown. No asterisks. No bold. No headers. No "Here is" prefix. Just the enhanced prompt text, paste-ready.`;
+
+// PRIMARY: GET endpoint (simplest, fastest, most reliable for free)
+async function callPollinationsGET(text, model, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  const fullPrompt = COMPACT_SYSTEM + "\n\nUser prompt to enhance:\n" + text;
+  const seed = Math.floor(Math.random() * 999999);
+  const url = "https://text.pollinations.ai/" + encodeURIComponent(fullPrompt) + "?model=" + model + "&seed=" + seed;
+
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status}: ${errBody.substring(0, 150)}`);
+    }
+
+    const result = await res.text();
+    if (!result || result.trim().length < 10) throw new Error('Empty response');
+    return result.trim();
+  } catch (e) {
+    clearTimeout(timer);
+    throw e;
+  }
+}
+
+// BACKUP: POST endpoint (for when GET URL is too long)
+async function callPollinationsPOST(text, model, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const res = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
+    const res = await fetch('https://text.pollinations.ai/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: model,
         messages: [
-          { role: 'system', content: MASTER_SYSTEM_PROMPT },
+          { role: 'system', content: COMPACT_SYSTEM },
           { role: 'user', content: text }
         ],
         max_tokens: 1200,
@@ -129,14 +163,38 @@ async function callPollinations(text, model, timeoutMs) {
 
     if (!res.ok) {
       const errBody = await res.text().catch(() => '');
-      throw new Error(`HTTP ${res.status}: ${errBody.substring(0, 200)}`);
+      throw new Error(`HTTP ${res.status}: ${errBody.substring(0, 150)}`);
     }
 
     const data = await res.json();
-    if (!data.choices?.[0]?.message) throw new Error('Invalid response');
+    if (!data.choices?.[0]?.message) throw new Error('Invalid response structure');
     return data.choices[0].message.content.trim();
   } catch (e) {
     clearTimeout(timer);
+    throw e;
+  }
+}
+
+// Smart caller: tries GET first (fast), falls back to POST if URL too long
+async function callPollinations(text, model, timeoutMs) {
+  const fullPrompt = COMPACT_SYSTEM + "\n\nUser prompt to enhance:\n" + text;
+  const estimatedUrlLength = 30 + encodeURIComponent(fullPrompt).length + model.length + 20;
+
+  // If URL would be too long (>4000 chars), use POST directly
+  if (estimatedUrlLength > 4000) {
+    return await callPollinationsPOST(text, model, timeoutMs);
+  }
+
+  // Try GET first (fastest)
+  try {
+    return await callPollinationsGET(text, model, timeoutMs);
+  } catch (e) {
+    // If GET fails with rate limit or error, try POST as backup
+    if (e.message.includes('429') || e.message.includes('Queue full')) {
+      console.log(`PromptFlow: GET rate-limited, trying POST for ${model}...`);
+      await new Promise(r => setTimeout(r, 1000)); // Brief pause
+      return await callPollinationsPOST(text, model, timeoutMs);
+    }
     throw e;
   }
 }
