@@ -280,7 +280,7 @@ async function enhancePrompt(text, settings) {
     }
   }
 
-  throw new Error(`All providers failed. Please check your internet connection and try again.`);
+  throw new Error(`All providers failed. Details:\n${errors.join('\n')}`);
 }
 
 // ═══════════════════════════════════════════════════════════════
