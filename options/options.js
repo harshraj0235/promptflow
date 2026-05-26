@@ -1,24 +1,108 @@
+// ═══════════════════════════════════════════
+// PromptFlow Pro v3.0 — Options Page Logic
+// ═══════════════════════════════════════════
+
 document.addEventListener('DOMContentLoaded', () => {
   const navItems = document.querySelectorAll('.nav-item');
   const sections = document.querySelectorAll('.settings-section');
   const toast = document.getElementById('toast');
   const themeSelect = document.getElementById('theme-select');
 
-  // Navigation
+  // ═══ Navigation ═══
   navItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const targetId = item.getAttribute('href').substring(1);
-      
       navItems.forEach(n => n.classList.remove('active'));
       sections.forEach(s => s.classList.remove('active'));
-      
       item.classList.add('active');
       document.getElementById(targetId).classList.add('active');
     });
   });
 
-  // Load Settings
+  // ═══ Toast Helper ═══
+  function showToast(message, type = 'success') {
+    toast.textContent = message;
+    toast.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#f59e0b';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // ═══ AI Provider Settings ═══
+  const providerSelect = document.getElementById('ai-provider-select');
+  const freeInfo = document.getElementById('free-info');
+  const groqCard = document.getElementById('groq-key-card');
+  const openaiCard = document.getElementById('openai-key-card');
+  const groqKeyInput = document.getElementById('groq-api-key');
+  const openaiKeyInput = document.getElementById('openai-api-key');
+  const saveProviderBtn = document.getElementById('save-provider-btn');
+
+  function updateProviderUI(value) {
+    freeInfo.style.display = value === 'auto' ? 'flex' : 'none';
+    groqCard.style.display = value === 'groq' ? 'block' : 'none';
+    openaiCard.style.display = value === 'openai' ? 'block' : 'none';
+  }
+
+  providerSelect.addEventListener('change', (e) => {
+    updateProviderUI(e.target.value);
+  });
+
+  // Load saved provider settings
+  chrome.storage.sync.get(['aiProvider', 'groqApiKey', 'openaiApiKey'], (res) => {
+    if (res.aiProvider) {
+      providerSelect.value = res.aiProvider;
+      updateProviderUI(res.aiProvider);
+    }
+    if (res.groqApiKey) groqKeyInput.value = res.groqApiKey;
+    if (res.openaiApiKey) openaiKeyInput.value = res.openaiApiKey;
+  });
+
+  // Save provider settings
+  saveProviderBtn.addEventListener('click', () => {
+    const provider = providerSelect.value;
+    const settings = { aiProvider: provider };
+
+    if (provider === 'groq') {
+      const key = groqKeyInput.value.trim();
+      if (!key) {
+        showToast('Please enter your Groq API key', 'error');
+        groqKeyInput.focus();
+        return;
+      }
+      settings.groqApiKey = key;
+    } else if (provider === 'openai') {
+      const key = openaiKeyInput.value.trim();
+      if (!key) {
+        showToast('Please enter your OpenAI API key', 'error');
+        openaiKeyInput.focus();
+        return;
+      }
+      settings.openaiApiKey = key;
+    }
+
+    chrome.storage.sync.set(settings, () => {
+      saveProviderBtn.textContent = '✅ Saved!';
+      saveProviderBtn.classList.add('saved');
+      showToast('AI Provider settings saved!');
+      setTimeout(() => {
+        saveProviderBtn.textContent = '💾 Save AI Provider Settings';
+        saveProviderBtn.classList.remove('saved');
+      }, 2000);
+    });
+  });
+
+  // Toggle API key visibility
+  document.getElementById('groq-toggle-visibility').addEventListener('click', () => {
+    const isPassword = groqKeyInput.type === 'password';
+    groqKeyInput.type = isPassword ? 'text' : 'password';
+  });
+
+  document.getElementById('openai-toggle-visibility').addEventListener('click', () => {
+    const isPassword = openaiKeyInput.type === 'password';
+    openaiKeyInput.type = isPassword ? 'text' : 'password';
+  });
+
+  // ═══ General Settings ═══
   chrome.storage.local.get(['theme', 'defaultView'], (res) => {
     if (res.theme) {
       themeSelect.value = res.theme;
@@ -28,13 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('default-view').value = res.defaultView;
     }
   });
-
-  // Save Settings
-  function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  }
 
   themeSelect.addEventListener('change', (e) => {
     const val = e.target.value;
@@ -49,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.set({ defaultView: e.target.value }, () => showToast('Default view saved!'));
   });
 
-  // Export Data
+  // ═══ Data & Storage ═══
   document.getElementById('export-btn').addEventListener('click', () => {
     chrome.storage.local.get(null, (data) => {
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -59,15 +136,17 @@ document.addEventListener('DOMContentLoaded', () => {
       a.download = `promptflow_backup_${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
+      showToast('Data exported successfully!');
     });
   });
 
-  // Clear Data
   document.getElementById('clear-data-btn').addEventListener('click', () => {
-    if (confirm("Are you sure you want to permanently delete all your prompts and settings?")) {
+    if (confirm("⚠️ Are you sure you want to permanently delete ALL your prompts, settings, and analytics? This cannot be undone.")) {
       chrome.storage.local.clear(() => {
-        showToast('All data cleared!');
-        setTimeout(() => location.reload(), 1500);
+        chrome.storage.sync.clear(() => {
+          showToast('All data cleared!');
+          setTimeout(() => location.reload(), 1500);
+        });
       });
     }
   });
