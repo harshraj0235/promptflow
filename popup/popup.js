@@ -108,25 +108,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const mode = document.querySelector('input[name="enhance-mode"]:checked').value;
     
-    // Simple mock logic for demonstration
-    enhanceBtn.textContent = 'Enhancing...';
+    enhanceBtn.textContent = '⏳ AI Enhancing...';
     
-    setTimeout(() => {
-      let output = input;
-      if (mode === 'clarify') {
-        output = `Please provide a clear and specific response to the following request: ${input}`;
-      } else if (mode === 'structured') {
-        output = `Act as an expert.\nContext: You are providing professional assistance.\nTask: ${input}\nFormat: Return the output in a structured markdown format.`;
-      } else if (mode === 'chain-of-thought') {
-        output = `Let's think step by step about the following problem:\n${input}\nPlease provide your reasoning process before your final answer.`;
-      } else {
-        output = `As a highly skilled professional, please address the following matter with a formal tone:\n${input}`;
+    chrome.runtime.sendMessage({ action: 'ai_enhance', text: input }, (response) => {
+      if (chrome.runtime.lastError || !response || !response.success) {
+        console.error("Enhancement failed:", chrome.runtime.lastError || response?.error);
+        alert("PromptFlow Pro: Failed to reach AI enhancer. Please check console.");
+        enhanceBtn.textContent = '✨ Enhance Prompt';
+        return;
       }
       
-      enhanceOutput.value = output;
+      enhanceOutput.value = response.text;
       enhanceResult.classList.remove('hidden');
       enhanceBtn.textContent = '✨ Enhance Prompt';
-    }, 800);
+    });
   });
 
   // Load prompts
