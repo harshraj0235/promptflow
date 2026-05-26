@@ -67,6 +67,36 @@
   transform: scale(0.96);
 }
 
+/* Tone/Goal Selector */
+.pf-inline-tone-select {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(230, 230, 240, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  margin: 0 4px;
+}
+
+.pf-inline-tone-select:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.pf-inline-tone-select:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+}
+
+.pf-inline-tone-select option {
+  background: #1e1e2e;
+  color: #fff;
+}
+
 /* Enhance Button — Premium gradient with glow */
 .pf-inline-enhance-btn {
   background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #6d28d9 100%);

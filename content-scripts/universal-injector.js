@@ -46,6 +46,18 @@ function createInlineButton() {
     }
   });
 
+  // Tone/Goal Selector
+  const toneSelect = document.createElement('select');
+  toneSelect.id = 'pf-universal-tone-select';
+  toneSelect.className = 'pf-inline-tone-select';
+  toneSelect.innerHTML = `
+    <option value="auto">🎯 Auto-Detect Goal</option>
+    <option value="coding">💻 Coding / Developer</option>
+    <option value="creative">✍️ Creative Writing</option>
+    <option value="image">🎨 Image / Midjourney</option>
+    <option value="professional">👔 Professional Business</option>
+  `;
+
   // Enhance Button
   inlineBtn = document.createElement('button');
   inlineBtn.id = 'pf-universal-inline-btn';
@@ -56,10 +68,12 @@ function createInlineButton() {
 
   inlineBtn.addEventListener('click', (e) => {
     e.preventDefault(); e.stopPropagation();
-    triggerEnhance();
+    const selectedTone = toneSelect.value;
+    triggerEnhance(selectedTone);
   });
 
   btnContainer.appendChild(saveBtn);
+  btnContainer.appendChild(toneSelect);
   btnContainer.appendChild(inlineBtn);
   document.body.appendChild(btnContainer);
 }
@@ -75,7 +89,7 @@ const PIPELINE_STAGES = [
   { icon: '✨', label: 'AI Optimizing...' },
 ];
 
-function triggerEnhance() {
+function triggerEnhance(tone = 'auto') {
   if (!activeInput || !inlineBtn) return;
   if (inlineBtn.classList.contains('pf-loading')) return; // Prevent double-click
 
@@ -96,7 +110,7 @@ function triggerEnhance() {
 
   // Send to background
   try {
-    chrome.runtime.sendMessage({ action: 'ai_enhance', text: text }, (response) => {
+    chrome.runtime.sendMessage({ action: 'ai_enhance', text: text, tone: tone }, (response) => {
       clearInterval(stageInterval);
 
       if (chrome.runtime.lastError || !response) {

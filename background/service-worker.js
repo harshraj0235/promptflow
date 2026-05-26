@@ -114,10 +114,15 @@ const COMPACT_SYSTEM = `You are an expert Prompt Engineer. Your task is to take 
 - Tone: Define the tone.
 ONLY provide the final, enhanced prompt. Do not include introductory text, markdown headers, or asterisks. Return it completely paste-ready.`;
 
+function getSystemPrompt(tone) {
+  if (!tone || tone === 'auto') return COMPACT_SYSTEM;
+  return COMPACT_SYSTEM + `\n\nCRITICAL INSTRUCTION: The user has explicitly requested to optimize this prompt for the following goal/tone: [${tone.toUpperCase()}]. Ensure the Context and Tone reflect this choice perfectly.`;
+}
+
 // Sleep helper
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function callPollinations(text, model, timeoutMs) {
+async function callPollinations(text, tone, model, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -128,7 +133,7 @@ async function callPollinations(text, model, timeoutMs) {
       body: JSON.stringify({
         model: model,
         messages: [
-          { role: 'system', content: COMPACT_SYSTEM },
+          { role: 'system', content: getSystemPrompt(tone) },
           { role: 'user', content: text }
         ],
         max_tokens: 1200,
@@ -208,7 +213,7 @@ async function callOpenAI(text, apiKey) {
 }
 
 // BYOK: Google Gemini (Best Free Tier)
-async function callGemini(text, apiKey) {
+async function callGemini(text, tone, apiKey) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
 
@@ -217,7 +222,7 @@ async function callGemini(text, apiKey) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        system_instruction: { parts: { text: COMPACT_SYSTEM } },
+        system_instruction: { parts: { text: getSystemPrompt(tone) } },
         contents: [{ parts: [{ text: text }] }],
         generationConfig: { maxOutputTokens: 1200, temperature: 0.7 }
       }),
@@ -252,14 +257,14 @@ function cleanText(raw) {
 // MAIN ENHANCE — Multi-provider with auto-failover
 // ═══════════════════════════════════════════════════════════════
 
-async function enhancePrompt(text, settings) {
+async function enhancePrompt(text, tone, settings) {
   const provider = settings.aiProvider || 'auto';
   const startTime = Date.now();
 
   // BYOK first if configured
   if (provider === 'gemini' && settings.geminiApiKey) {
     try {
-      const result = await callGemini(text, settings.geminiApiKey);
+      const result = await callGemini(text, tone, settings.geminiApiKey);
       return { text: cleanText(result), provider: 'Gemini (Free)', time: Date.now() - startTime };
     } catch (e) {
       console.warn('PromptFlow: Gemini BYOK failed, falling back...', e.message);
@@ -293,7 +298,7 @@ async function enhancePrompt(text, settings) {
     while (retries >= 0) {
       try {
         console.log(`PromptFlow: Trying ${prov.name}... (Retries left: ${retries})`);
-        const result = await callPollinations(text, prov.model, prov.timeout);
+        const result = await callPollinations(text, tone, prov.model, prov.timeout);
         const elapsed = Date.now() - startTime;
         console.log(`PromptFlow: ${prov.name} responded in ${elapsed}ms`);
         return { text: cleanText(result), provider: prov.name, time: elapsed };
@@ -363,16 +368,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   // AI Enhance — The core feature
   if (request.action === 'ai_enhance') {
+    const tone = request.tone || 'auto';
+    const cacheKey = tone + '|' + request.text;
+
     // Cache = instant
-    if (enhanceCache.has(request.text)) {
-      sendResponse({ success: true, text: enhanceCache.get(request.text), provider: 'Cache', time: 0 });
+    if (enhanceCache.has(cacheKey)) {
+      sendResponse({ success: true, text: enhanceCache.get(cacheKey), provider: 'Cache', time: 0 });
       return true;
     }
 
-    chrome.storage.sync.get(['aiProvider', 'groqApiKey', 'openaiApiKey'], (settings) => {
-      enhancePrompt(request.text, settings || {})
+    chrome.storage.sync.get(['aiProvider', 'geminiApiKey', 'groqApiKey', 'openaiApiKey'], (settings) => {
+      enhancePrompt(request.text, tone, settings || {})
         .then(result => {
-          enhanceCache.set(request.text, result.text);
+          enhanceCache.set(cacheKey, result.text);
           sendResponse({ success: true, text: result.text, provider: result.provider, time: result.time });
         })
         .catch(err => {
