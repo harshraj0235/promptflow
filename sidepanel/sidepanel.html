@@ -13,13 +13,11 @@
       <span class="logo-icon">✨</span>
       <h1>PromptFlow <span class="pro">Pro</span></h1>
     </div>
-    <button id="btn-back" class="icon-btn hidden" title="Go Back">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </button>
   </header>
 
-  <!-- View: Home -->
-  <main id="view-home" class="view active">
+  <main id="view-unified" class="view active">
+    
+    <!-- Dashboard Stats -->
     <div class="analytics-dashboard" style="display:flex;gap:12px;margin-bottom:20px;">
       <div class="stat-card" style="flex:1;background:#f3f4f6;padding:12px;border-radius:8px;text-align:center;">
         <h4 style="margin:0;font-size:12px;color:#6b7280;">Prompts Today</h4>
@@ -30,87 +28,79 @@
         <h2 id="stat-time" style="margin:4px 0 0;color:#10b981;">0m</h2>
       </div>
     </div>
-    <p class="subtitle">Your ultimate AI productivity suite.</p>
-    <div class="feature-grid">
-      <div class="feature-card" data-target="view-vault">
-        <div class="card-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></div>
-        <div class="card-content"><h3>Prompt Vault 2.0</h3><p>Manage folders, tags, ratings</p></div>
-      </div>
-      <div class="feature-card" data-target="view-craft">
-        <div class="card-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg></div>
-        <div class="card-content"><h3>Craft & Chain</h3><p>Enhance and run workflows</p></div>
-      </div>
-      <div class="feature-card" data-target="view-export">
-        <div class="card-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
-        <div class="card-content"><h3>Export Chat</h3><p>Export conversation cross-platform</p></div>
-      </div>
-      <div class="feature-card" data-target="view-settings">
-        <div class="card-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg></div>
-        <div class="card-content"><h3>Settings</h3><p>Configure sharing & data</p></div>
-      </div>
-    </div>
-  </main>
 
-  <!-- View: Vault -->
-  <main id="view-vault" class="view">
-    <div class="view-header" style="display:flex; justify-content:space-between; align-items:center;">
-      <h2 style="margin:0;">Saved Prompts</h2>
-      <button id="vault-share-btn" class="secondary-btn" style="padding:4px 8px; font-size:12px;">Share</button>
-    </div>
-    <div style="display:flex; gap:8px; margin-bottom: 12px;">
-      <input type="text" id="vault-search" placeholder="Search prompts..." style="flex:2; padding:8px; border:1px solid #ccc; border-radius:6px; font-family:inherit;">
-      <select id="vault-folder-filter" style="flex:1; padding:8px; border:1px solid #ccc; border-radius:6px; font-family:inherit; font-size:12px;">
-        <option value="All">All Folders</option>
-        <option value="Uncategorized">Uncategorized</option>
-      </select>
-    </div>
-    <div class="input-group">
-      <textarea id="vault-new-input" placeholder="Paste a prompt here to save it..."></textarea>
-      <div style="display:flex; gap:8px; width:100%;">
-        <input type="text" id="vault-new-folder" placeholder="Folder" style="flex:1; padding:8px; border:1px solid #eee; border-radius:6px; font-family:inherit;" />
-        <button id="vault-save-btn" class="primary-btn" style="flex:2;">Save Prompt</button>
+    <!-- SECTION: Craft & Enhance -->
+    <section class="unified-section">
+      <div class="section-header">
+        <div class="card-icon purple" style="transform: scale(0.8);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg></div>
+        <h2>Craft & Chain</h2>
       </div>
-    </div>
-    <div id="vault-list" class="prompt-list"></div>
-  </main>
+      <div class="input-group">
+        <textarea id="craft-input" placeholder="Type a rough idea... (e.g. 'write an email to boss about vacation')"></textarea>
+        <div style="display:flex; gap:8px; margin-bottom: 8px;">
+          <select id="craft-tone-select" style="flex:1; padding:8px; border:1px solid #eee; border-radius:6px; font-family:inherit; font-size:12px; background: #fafafa;">
+            <option value="auto">🎯 Auto-Detect Goal</option>
+            <option value="coding">💻 Coding / Developer</option>
+            <option value="creative">✍️ Creative Writing</option>
+            <option value="image">🎨 Image / Midjourney</option>
+            <option value="professional">👔 Professional Business</option>
+          </select>
+          <button id="craft-btn" class="primary-btn" style="flex:1;">✨ Enhance</button>
+        </div>
+      </div>
+      <div class="result-group hidden" id="craft-result-group">
+        <textarea id="craft-output" readonly></textarea>
+        <button id="craft-copy-btn" class="secondary-btn">Copy to Clipboard</button>
+      </div>
+    </section>
 
-  <!-- View: Craft -->
-  <main id="view-craft" class="view">
-    <div class="view-header"><h2>Craft Prompt</h2></div>
-    <div class="input-group">
-      <textarea id="craft-input" placeholder="Type a rough idea... (e.g. 'write an email to boss about vacation')"></textarea>
-      <button id="craft-btn" class="primary-btn">✨ Enhance</button>
-    </div>
-    <div class="result-group hidden" id="craft-result-group">
-      <textarea id="craft-output" readonly></textarea>
-      <button id="craft-copy-btn" class="secondary-btn">Copy to Clipboard</button>
-    </div>
-  </main>
+    <!-- SECTION: Prompt Vault -->
+    <section class="unified-section" style="margin-top:24px;">
+      <div class="section-header">
+        <div class="card-icon blue" style="transform: scale(0.8);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></div>
+        <h2>Prompt Vault</h2>
+      </div>
+      
+      <div style="display:flex; gap:8px; margin-bottom: 12px;">
+        <input type="text" id="vault-search" placeholder="Search..." style="flex:2; padding:8px; border:1px solid #ccc; border-radius:6px; font-family:inherit;">
+        <select id="vault-folder-filter" style="flex:1; padding:8px; border:1px solid #ccc; border-radius:6px; font-family:inherit; font-size:12px;">
+          <option value="All">All Folders</option>
+        </select>
+      </div>
 
-  <!-- View: Export -->
-  <main id="view-export" class="view">
-    <div class="view-header"><h2>Export Chat</h2></div>
-    <div class="card-info">
-      <p>Extracts the current conversation from ChatGPT, Claude, Gemini, or Perplexity as a Markdown document.</p>
-    </div>
-    <button id="export-btn" class="primary-btn full-width" style="margin-top:16px;">Download Chat (.md)</button>
-    <div id="export-status" class="status-msg"></div>
-  </main>
+      <div class="input-group">
+        <textarea id="vault-new-input" placeholder="Paste a prompt here to save it..."></textarea>
+        <div style="display:flex; gap:8px; width:100%;">
+          <input type="text" id="vault-new-folder" placeholder="Folder" style="flex:1; padding:8px; border:1px solid #eee; border-radius:6px; font-family:inherit;" />
+          <button id="vault-save-btn" class="primary-btn" style="flex:2;">Save Prompt</button>
+        </div>
+      </div>
 
-  <!-- View: Settings -->
-  <main id="view-settings" class="view">
-    <div class="view-header"><h2>Settings</h2></div>
-    <div class="card-info">
-      <p><strong>Keyboard Shortcuts:</strong></p>
-      <p><kbd>Ctrl+M</kbd> or <kbd>Cmd+M</kbd> to enhance active prompt.</p>
-      <p><kbd>Ctrl+Shift+P</kbd> or <kbd>Cmd+Shift+P</kbd> to open Command Palette.</p>
-    </div>
-    <div class="card-info" style="margin-top:16px;">
-      <p><strong>Team Import:</strong></p>
-      <textarea id="import-json" placeholder="Paste a Base64 Share Link here..." style="width:100%; height:60px; margin-top:8px; font-family:monospace; padding:8px; font-size:10px;"></textarea>
-      <button id="settings-import-btn" class="secondary-btn full-width" style="margin-top:8px;">Import Collection</button>
-    </div>
-    <button id="settings-clear-btn" class="danger-btn full-width" style="margin-top:24px;">Clear Saved Prompts</button>
+      <!-- Scrollable list of prompts -->
+      <div id="vault-list" class="prompt-list" style="max-height: 400px; overflow-y: auto; padding-right:4px;"></div>
+    </section>
+
+    <!-- SECTION: Utilities & Export -->
+    <section class="unified-section" style="margin-top:24px; padding-bottom:30px;">
+      <div class="section-header">
+        <div class="card-icon green" style="transform: scale(0.8);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
+        <h2>Utilities</h2>
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <button id="export-btn" class="primary-btn" style="flex:1;">Download Chat (.md)</button>
+        <button id="vault-share-btn" class="secondary-btn" style="flex:1;">Share Vault Link</button>
+      </div>
+      <div id="export-status" class="status-msg" style="text-align:center;"></div>
+      
+      <div class="card-info" style="margin-top:16px;">
+        <p style="font-size:12px; margin-bottom:4px;"><strong>Import Collection</strong></p>
+        <textarea id="import-json" placeholder="Paste a Base64 Share Link here..." style="width:100%; height:40px; margin-bottom:8px; font-family:monospace; padding:8px; font-size:10px;"></textarea>
+        <button id="settings-import-btn" class="secondary-btn full-width">Import</button>
+      </div>
+
+      <button id="settings-clear-btn" class="danger-btn full-width" style="margin-top:24px;">Clear All Saved Prompts</button>
+    </section>
+
   </main>
 
   <script src="sidepanel.js"></script>

@@ -46,86 +46,36 @@ h1 {
 }
 
 main {
-  padding: 24px;
   flex: 1;
+  padding: 20px;
   overflow-y: auto;
+  padding-bottom: 40px;
 }
 
-.subtitle {
-  color: #9ca3af;
-  font-size: 14px;
-  margin-bottom: 24px;
-}
+/* === Unified Section Layout === */
 
-.feature-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.feature-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.feature-card:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-
-.feature-card:hover::before {
-  opacity: 1;
-}
-
-.card-icon {
-  width: 48px;
-  height: 48px;
+.unified-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
-.card-icon.blue { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
-.card-icon.purple { background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
-.card-icon.green { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
-.card-icon.orange { background: rgba(249, 115, 22, 0.1); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.2); }
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
 
-.card-content h3 {
+.section-header h2 {
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
-  margin-bottom: 4px;
-}
-
-.card-content p {
-  font-size: 13px;
-  color: #9ca3af;
-  line-height: 1.4;
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
 /* Custom Scrollbar */
@@ -143,45 +93,24 @@ main {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Views */
-.view {
-  display: none;
-  animation: fadeIn 0.3s ease;
-}
-.view.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateX(10px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
-.icon-btn:hover {
-  background: rgba(255,255,255,0.1);
-}
+
+.card-icon.blue { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+.card-icon.purple { background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
+.card-icon.green { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+.card-icon.orange { background: rgba(249, 115, 22, 0.1); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.2); }
+
 .hidden { display: none !important; }
 
 /* Subview styles */
-.view-header {
-  margin-bottom: 20px;
-}
-.view-header h2 {
-  font-size: 18px;
-  font-weight: 600;
-}
-
 .input-group {
   display: flex;
   flex-direction: column;
@@ -255,13 +184,6 @@ textarea:focus {
   color: #9ca3af;
   font-size: 14px;
   margin-bottom: 8px;
-}
-.card-info kbd {
-  background: rgba(255,255,255,0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: monospace;
-  color: #fff;
 }
 
 .prompt-list {

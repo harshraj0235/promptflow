@@ -1,29 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   
-  // --- Routing & Navigation ---
-  const views = document.querySelectorAll('.view');
-  const btnBack = document.getElementById('btn-back');
-  
-  function switchView(targetId) {
-    views.forEach(v => v.classList.remove('active'));
-    document.getElementById(targetId).classList.add('active');
-    
-    if (targetId === 'view-home') {
-      btnBack.classList.add('hidden');
-    } else {
-      btnBack.classList.remove('hidden');
-    }
-  }
-
-  btnBack.addEventListener('click', () => switchView('view-home'));
-
-  document.querySelectorAll('.feature-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const target = card.getAttribute('data-target');
-      if (target) switchView(target);
-    });
-  });
-
   // --- Analytics Dashboard ---
   function loadAnalytics() {
     chrome.storage.local.get(['analytics'], (res) => {
@@ -159,23 +135,25 @@ document.addEventListener('DOMContentLoaded', () => {
       navigator.clipboard.writeText(b64);
       const btn = document.getElementById('vault-share-btn');
       btn.innerText = 'Copied Link!';
-      setTimeout(() => btn.innerText = 'Share', 2000);
+      setTimeout(() => btn.innerText = 'Share Vault Link', 2000);
     });
   });
 
   // --- Craft Feature ---
   const craftInput = document.getElementById('craft-input');
   const craftBtn = document.getElementById('craft-btn');
+  const craftToneSelect = document.getElementById('craft-tone-select');
   const craftOutput = document.getElementById('craft-output');
   const craftResultGroup = document.getElementById('craft-result-group');
   const craftCopyBtn = document.getElementById('craft-copy-btn');
 
   craftBtn.addEventListener('click', () => {
     const text = craftInput.value.trim();
+    const tone = craftToneSelect.value;
     if (!text) return;
     
     craftBtn.innerHTML = '⏳ Enhancing...';
-    chrome.runtime.sendMessage({ action: 'ai_enhance', text: text }, (response) => {
+    chrome.runtime.sendMessage({ action: 'ai_enhance', text: text, tone: tone }, (response) => {
       craftBtn.innerHTML = '✨ Enhance';
       if (chrome.runtime.lastError || !response || !response.success) {
          craftOutput.value = "Error: Failed to reach AI enhancer.";
