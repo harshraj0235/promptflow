@@ -101,9 +101,8 @@ CRITICAL OUTPUT RULES:
 // ═══════════════════════════════════════════════════════════════
 
 const FREE_PROVIDERS = [
-  { name: 'GPT-5 Nano',     model: 'openai-fast',  timeout: 15000 },
-  { name: 'OpenAI',         model: 'openai',       timeout: 20000 },
-  { name: 'Mistral 3.2',    model: 'mistral',      timeout: 20000 }
+  { name: 'Pollinations AI (Fast)', model: 'openai-fast',  timeout: 30000 },
+  { name: 'Pollinations AI (Base)', model: 'openai',       timeout: 30000 }
 ];
 
 const COMPACT_SYSTEM = `You are an expert Prompt Engineer. Your task is to take the user's raw input and transform it into a highly effective, structured prompt. Follow the CREATE framework:
