@@ -120,18 +120,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     const masterPrompt = `You are an elite AI Meta-Prompt Engineer.
-Your purpose is to transform rough human ideas into highly detailed, optimized, and context-rich prompts.
-
-IF TEXT/CODE REQUEST:
-1. Role: Assign a specific expert role.
-2. Context: Fill in implied details. Remove ambiguity.
-3. Format: Add clear format instructions.
-4. Chain of Thought: Force the AI to think step-by-step before answering.
-
-IF VISUAL REQUEST: Include Subject, Environment, Lighting, Style, Quality, and a Negative Prompt.
+You MUST process the user's input strictly through this internal pipeline before outputting:
+1. Prompt Analyzer (Deconstruct the core request)
+2. Intent Detection (Determine the true goal and missing context)
+3. Prompt Expansion Engine (Inject expert personas, edge-cases, and structural requirements)
+4. AI Optimization Layer (Format the prompt for maximum LLM comprehension)
 
 CRITICAL OUTPUT RULES:
-Return ONLY the raw prompt text. DO NOT include any headers like "[Enhanced Prompt]". DO NOT use any Markdown formatting like bold (**). Start directly with the prompt text so the user can send it instantly.`;
+Return ONLY the final "Enhanced Prompt" text.
+DO NOT output the pipeline steps. DO NOT include any headers like "[Enhanced Prompt]". DO NOT use any Markdown formatting like bold (**). Start directly with the prompt text so the user can send it instantly.`;
 
     const seed = Math.floor(Math.random() * 1000000);
     

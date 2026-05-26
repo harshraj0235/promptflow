@@ -31,9 +31,20 @@ function createInlineButton() {
     const text = activeInput.value || activeInput.innerText;
     if (!text.trim()) { alert("PromptFlow Pro: Please type a prompt first."); return; }
     
-    inlineBtn.innerHTML = '⏳ Enhancing...';
+    let currentStep = 0;
+    const loadingSteps = ['⏳ Prompt Analyzer...', '🧠 Intent Detection...', '⚙️ Expansion Engine...', '✨ AI Optimization...'];
+    inlineBtn.innerHTML = loadingSteps[0];
+    
+    const loadingInterval = setInterval(() => {
+      currentStep++;
+      if (currentStep < loadingSteps.length) {
+        inlineBtn.innerHTML = loadingSteps[currentStep];
+      }
+    }, 400);
+
     try {
       chrome.runtime.sendMessage({ action: 'ai_enhance', text: text }, (response) => {
+        clearInterval(loadingInterval);
         inlineBtn.innerHTML = '✨ Enhance';
         if (chrome.runtime.lastError || !response || !response.success) {
            alert("PromptFlow Pro: Failed to reach AI enhancer.");
