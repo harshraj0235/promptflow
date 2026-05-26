@@ -95,17 +95,27 @@ Return ONLY the raw prompt text (and negative prompt if visual).
 DO NOT include any headers like "[Enhanced Prompt]", "**[Enhanced Prompt]**", or "Role:", "Context:".
 CRITICAL: DO NOT use ANY Markdown formatting in your output. No asterisks (** or *). Output plain text only.
 Just start directly with the perfectly crafted prompt text so the user can send it to the AI immediately.
-Keep the output extremely concise and generate it as fast as possible.
-
-User's raw input:
-"${request.text}"`;
+Keep the output extremely concise and generate it as fast as possible.`;
 
     // Append a random seed to prevent caching collisions and handle rate limit queues better
     const seed = Math.floor(Math.random() * 1000000);
-    // 'openai' is the most stable and fastest model currently available on the legacy API.
-    const url = 'https://text.pollinations.ai/' + encodeURIComponent(masterPrompt) + '?seed=' + seed + '&model=openai';
     
-    fetch(url)
+    // Use POST endpoint with 'openai' model (maps to fast gpt-4o-mini) for production-scale speed
+    const payload = {
+      model: "openai", 
+      messages: [
+        { role: "system", content: masterPrompt },
+        { role: "user", content: request.text }
+      ],
+      seed: seed,
+      temperature: 0.5
+    };
+
+    fetch('https://text.pollinations.ai/openai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
       .then(async res => {
         if (!res.ok) {
            const errText = await res.text();
@@ -116,7 +126,8 @@ User's raw input:
            } catch(e) {}
            throw new Error(errMsg || `Server returned ${res.status}`);
         }
-        return res.text();
+        const data = await res.json();
+        return data.choices[0].message.content;
       })
       .then(enhancedText => {
         // Strip any residual headers and strip markdown bold asterisks just in case
