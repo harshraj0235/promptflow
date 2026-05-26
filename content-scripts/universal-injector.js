@@ -39,20 +39,17 @@ function createInlineButton() {
     
     // Simulate enhancement
     const originalText = inlineBtn.innerHTML;
-    inlineBtn.innerHTML = '⏳...';
+    inlineBtn.innerHTML = '⏳ AI Enhancing...';
     
-    setTimeout(() => {
-      const enhanced = `You are a world-class expert. Please perform the following task:
-
-<task>
-${text}
-</task>
-
-Before answering, please:
-1. Think step-by-step and lay out your logical reasoning.
-2. Consider any critical edge cases or important context.
-
-Please provide a highly detailed, accurate, and logically structured response. Ensure the tone is professional, clear, and the formatting uses clean Markdown (bullet points, bold text, and code blocks where necessary).`;
+    chrome.runtime.sendMessage({ action: 'ai_enhance', text: text }, (response) => {
+      if (chrome.runtime.lastError || !response || !response.success) {
+         console.error("Enhancement failed:", chrome.runtime.lastError || response?.error);
+         alert("PromptFlow Pro: Failed to reach AI enhancer. Please check console.");
+         inlineBtn.innerHTML = originalText;
+         return;
+      }
+      
+      const enhanced = response.text;
       
       // Update input
       if (activeInput.tagName === 'TEXTAREA' || activeInput.tagName === 'INPUT') {
@@ -70,7 +67,7 @@ Please provide a highly detailed, accurate, and logically structured response. E
       if (tracker) tracker.setValue('');
       
       inlineBtn.innerHTML = originalText;
-    }, 800);
+    });
   });
   
   // Attach directly to body so it escapes all overflow: hidden containers

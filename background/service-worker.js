@@ -57,3 +57,33 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     console.log("Enhance:", info.selectionText);
   }
 });
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'ai_enhance') {
+    const masterPrompt = `You are a world-class AI Prompt Engineer specialized in transforming rough human ideas into highly detailed, cinematic, AI-optimized prompts.
+Your task is to take the user's rough idea and convert it into an ultra-detailed professional AI prompt.
+
+User's rough idea:
+"${request.text}"
+
+Always output exactly in this format:
+
+[Enhanced Cinematic Prompt goes here...]
+
+Negative Prompt: [Negative Prompt]
+AI Optimization Notes: [Notes]
+Viral Hook: [Hook]
+Cinematic Style Tags: [Tags]`;
+
+    fetch('https://text.pollinations.ai/' + encodeURIComponent(masterPrompt))
+      .then(res => res.text())
+      .then(enhancedText => {
+        sendResponse({ success: true, text: enhancedText });
+      })
+      .catch(err => {
+        sendResponse({ success: false, error: err.message });
+      });
+      
+    return true; // Keep channel open for async response
+  }
+});
