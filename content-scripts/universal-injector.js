@@ -7,76 +7,120 @@ function initialize() {
   }
 }
 
-function injectInlineButton(inputElement) {
-  if (inputElement.dataset.pfInjected) return;
-  inputElement.dataset.pfInjected = "true";
+// Keep track of the active input
+let activeInput = null;
+let inlineBtn = null;
 
-  // Try to find the closest wrapper
-  const wrapper = inputElement.parentElement;
-  if (!wrapper) return;
+function createInlineButton() {
+  if (document.getElementById('pf-universal-inline-btn')) return;
+
+  inlineBtn = document.createElement('button');
+  inlineBtn.id = 'pf-universal-inline-btn';
+  inlineBtn.className = 'pf-inline-enhance-btn';
+  inlineBtn.innerHTML = '✨ Enhance';
+  inlineBtn.title = 'Enhance Prompt with AI';
+  inlineBtn.type = 'button';
   
-  const enhanceBtn = document.createElement('button');
-  enhanceBtn.className = 'pf-inline-enhance-btn';
-  enhanceBtn.innerHTML = '✨ Enhance';
-  enhanceBtn.title = 'Enhance Prompt with AI';
-  enhanceBtn.type = 'button';
+  // Start hidden
+  inlineBtn.style.display = 'none';
   
-  enhanceBtn.addEventListener('click', (e) => {
+  inlineBtn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
     
+    if (!activeInput) return;
+    
     // Get text
-    const text = inputElement.value || inputElement.innerText;
+    const text = activeInput.value || activeInput.innerText;
     if (!text.trim()) {
       alert("PromptFlow Pro: Please type a prompt first to enhance it.");
       return;
     }
     
     // Simulate enhancement
-    const originalText = enhanceBtn.innerHTML;
-    enhanceBtn.innerHTML = '⏳...';
+    const originalText = inlineBtn.innerHTML;
+    inlineBtn.innerHTML = '⏳...';
     
     setTimeout(() => {
       const enhanced = `Act as an expert in this domain. Task: ${text}\nPlease provide a detailed, well-structured response.`;
       
       // Update input
-      if (inputElement.tagName === 'TEXTAREA' || inputElement.tagName === 'INPUT') {
-        inputElement.value = enhanced;
+      if (activeInput.tagName === 'TEXTAREA' || activeInput.tagName === 'INPUT') {
+        activeInput.value = enhanced;
       } else {
-        inputElement.innerText = enhanced;
+        activeInput.innerText = enhanced;
       }
       
       // Dispatch events for React/Angular/Vue etc
-      inputElement.dispatchEvent(new Event('input', { bubbles: true }));
-      inputElement.dispatchEvent(new Event('change', { bubbles: true }));
+      activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+      activeInput.dispatchEvent(new Event('change', { bubbles: true }));
       
-      enhanceBtn.innerHTML = originalText;
+      // React 16+ value setter override hack for ChatGPT
+      const tracker = activeInput._valueTracker;
+      if (tracker) tracker.setValue('');
+      
+      inlineBtn.innerHTML = originalText;
     }, 800);
   });
   
-  // Injecting it inside the wrapper and absolute positioning it
-  wrapper.style.position = wrapper.style.position === 'static' || !wrapper.style.position ? 'relative' : wrapper.style.position;
-  wrapper.appendChild(enhanceBtn);
+  // Attach directly to body so it escapes all overflow: hidden containers
+  document.body.appendChild(inlineBtn);
+}
+
+function updateButtonPosition() {
+  if (!inlineBtn || !activeInput) return;
+  
+  const rect = activeInput.getBoundingClientRect();
+  
+  // If input is not visible on screen, hide button
+  if (rect.width === 0 || rect.height === 0 || rect.top < 0 || rect.bottom > window.innerHeight) {
+    inlineBtn.style.display = 'none';
+    return;
+  }
+  
+  inlineBtn.style.display = 'flex';
+  
+  // Position it relative to the viewport, pinned to the top-right of the input field
+  inlineBtn.style.position = 'fixed';
+  inlineBtn.style.top = (rect.top - 40) + 'px'; // 40px above the input
+  inlineBtn.style.left = (rect.right - 110) + 'px'; // align to right side
 }
 
 // Simple MutationObserver to detect when the UI is fully loaded
 const observer = new MutationObserver((mutations) => {
-  // Found a textarea or contenteditable, assume the chat interface is loaded
   const inputs = document.querySelectorAll('textarea, [contenteditable="true"]');
   if (inputs.length > 0) {
     initialize();
     
+    // Find the primary input (largest one usually)
+    let bestInput = null;
+    let maxArea = 0;
+    
     inputs.forEach(input => {
-      // Exclude very small inputs or hidden ones (like search bars vs chat input)
       const rect = input.getBoundingClientRect();
-      if (rect.width > 200 && rect.height > 20) {
-        injectInlineButton(input);
+      const area = rect.width * rect.height;
+      // Chat inputs are typically wide
+      if (rect.width > 200 && rect.height > 20 && area > maxArea) {
+        maxArea = area;
+        bestInput = input;
       }
     });
+    
+    if (bestInput && bestInput !== activeInput) {
+      activeInput = bestInput;
+      createInlineButton();
+      updateButtonPosition();
+    }
   }
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
+
+// Update position on scroll or resize
+window.addEventListener('scroll', updateButtonPosition, true);
+window.addEventListener('resize', updateButtonPosition);
+// Also poll every 500ms just in case the UI dynamically resizes (like when typing multiple lines)
+setInterval(updateButtonPosition, 500);
 
 // Attempt immediate init
 initialize();

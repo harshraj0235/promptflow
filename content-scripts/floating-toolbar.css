@@ -61,9 +61,6 @@
 
 /* Inline Enhance Button inserted directly into the AI prompt input */
 .pf-inline-enhance-btn {
-  position: absolute;
-  top: -40px; /* Floating slightly above the input field */
-  right: 10px;
   background: linear-gradient(135deg, #6C5CE7, #a855f7);
   color: white;
   border: none;
@@ -73,12 +70,12 @@
   font-weight: 600;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
-  z-index: 2147483647;
+  z-index: 2147483647; /* Ensure it floats above absolutely everything */
   display: flex;
   align-items: center;
   gap: 4px;
   box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   pointer-events: auto;
 }
 
