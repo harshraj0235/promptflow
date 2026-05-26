@@ -152,8 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const tone = craftToneSelect.value;
     if (!text) return;
     
-    craftBtn.innerHTML = '⏳ Enhancing...';
+    craftBtn.innerHTML = '⏳ Engineering (Pass 1)...';
+    const passTimer = setTimeout(() => {
+      if (craftBtn.innerHTML.includes('Pass 1')) craftBtn.innerHTML = '✨ Scoring (Pass 2)...';
+    }, 4000);
+
     chrome.runtime.sendMessage({ action: 'ai_enhance', text: text, tone: tone }, (response) => {
+      clearTimeout(passTimer);
       craftBtn.innerHTML = '✨ Enhance';
       if (chrome.runtime.lastError || !response || !response.success) {
          craftOutput.value = "Error: Failed to reach AI enhancer.";

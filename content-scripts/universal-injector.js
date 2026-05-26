@@ -83,10 +83,9 @@ function createInlineButton() {
 // ═══════════════════════════════════════════
 
 const PIPELINE_STAGES = [
-  { icon: '🔍', label: 'Analyzing Prompt...' },
-  { icon: '🧠', label: 'Detecting Intent...' },
-  { icon: '⚙️', label: 'Expanding Details...' },
-  { icon: '✨', label: 'AI Optimizing...' },
+  { icon: '🔍', label: 'Analyzing Intent...' },
+  { icon: '⚙️', label: 'Engineering Prompt (Pass 1)...' },
+  { icon: '✨', label: 'Scoring & Refining (Pass 2)...' },
 ];
 
 function triggerEnhance(tone = 'auto') {

@@ -105,12 +105,11 @@ const FREE_PROVIDERS = [
   { name: 'Pollinations AI (Base)', model: 'openai',       timeout: 30000 }
 ];
 
-const CRAFTED_PLUS_SYSTEM = `You are an elite Prompt Architect.
-
+const PASS1_SYSTEM = `You are an elite Prompt Architect.
 Your task is to transform vague user input into a precise, optimized, high-performance AI prompt.
 
 Your objectives:
-- Infer user intent
+- Infer user intent and target audience
 - Add missing clarity
 - Structure instructions logically
 - Define role/context
@@ -120,24 +119,26 @@ Your objectives:
 - Optimize for the selected AI model
 - Preserve original user intent exactly
 
-Rules:
-- Never change the core meaning
-- Never add unrelated assumptions
-- Reduce ambiguity
-- Maximize output quality
-- Make prompts production-ready
-
 Return ONLY the enhanced prompt. Do not include conversational filler like "Here is your prompt". Return it completely paste-ready.`;
 
-function getSystemPrompt(tone) {
-  if (!tone || tone === 'auto') return CRAFTED_PLUS_SYSTEM;
-  return CRAFTED_PLUS_SYSTEM + `\n\nCRITICAL INSTRUCTION: The user has explicitly requested to optimize this prompt for the following goal/tone: [${tone.toUpperCase()}]. Ensure the Tone and Context reflect this choice perfectly.`;
+const PASS2_SYSTEM = `You are an elite Prompt Scorer and Refiner.
+Your task is to evaluate the provided engineered prompt, fix any remaining ambiguities, and append a Prompt Quality Score.
+
+Rules:
+1. Polish the text for maximum clarity and structural flow.
+2. DO NOT change the core meaning.
+3. At the very bottom of the prompt, append exactly this format: "Prompt Quality Score: [XX]/100" (where XX is your rigorous evaluation of the prompt's clarity, context, and constraints).
+4. Return ONLY the final polished prompt with the score attached. No conversational filler.`;
+
+function getPass1SystemPrompt(tone) {
+  if (!tone || tone === 'auto') return PASS1_SYSTEM;
+  return PASS1_SYSTEM + `\n\nCRITICAL INSTRUCTION: The user has explicitly requested to optimize this prompt for the following goal/tone: [${tone.toUpperCase()}]. Ensure the Tone and Context reflect this choice perfectly.`;
 }
 
 // Sleep helper
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function callPollinations(text, tone, model) {
+async function callPollinations(text, systemPrompt, model) {
   try {
     const res = await fetch('https://text.pollinations.ai/openai/v1/chat/completions', {
       method: 'POST',
@@ -145,7 +146,7 @@ async function callPollinations(text, tone, model) {
       body: JSON.stringify({
         model: model,
         messages: [
-          { role: 'system', content: getSystemPrompt(tone) },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: text }
         ],
         max_tokens: 1500,
@@ -185,13 +186,11 @@ function cleanText(raw) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MAIN ENHANCE — Pollinations Only
+// MAIN ENHANCE — Pollinations Multi-Pass Architecture
 // ═══════════════════════════════════════════════════════════════
 
 async function enhancePrompt(text, tone, settings) {
   const startTime = Date.now();
-
-  // FREE STACK — Try each provider until one succeeds (with retry logic for Queue Full)
   const errors = [];
   
   for (const prov of FREE_PROVIDERS) {
@@ -199,11 +198,15 @@ async function enhancePrompt(text, tone, settings) {
     
     while (retries >= 0) {
       try {
-        console.log(`PromptFlow: Trying ${prov.name}... (Retries left: ${retries})`);
-        const result = await callPollinations(text, tone, prov.model);
+        console.log(`PromptFlow: Pass 1 (Engineering) on ${prov.name}...`);
+        const pass1Result = await callPollinations(text, getPass1SystemPrompt(tone), prov.model);
+        
+        console.log(`PromptFlow: Pass 2 (Scoring & Refinement) on ${prov.name}...`);
+        const pass2Result = await callPollinations(pass1Result, PASS2_SYSTEM, prov.model);
+        
         const elapsed = Date.now() - startTime;
-        console.log(`PromptFlow: ${prov.name} responded in ${elapsed}ms`);
-        return { text: cleanText(result), provider: prov.name, time: elapsed };
+        console.log(`PromptFlow: Multi-Pass on ${prov.name} finished in ${elapsed}ms`);
+        return { text: cleanText(pass2Result), provider: prov.name, time: elapsed };
       } catch (e) {
         if ((e.message === 'RATE_LIMIT' || e.message.includes('429')) && retries > 0) {
             console.log(`Queue full for ${prov.name}, waiting 2 seconds...`);
