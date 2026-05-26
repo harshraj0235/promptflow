@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
       const activeTab = tabs[0];
-      if (!activeTab || activeTab.url.startsWith('chrome://')) {
+      if (!activeTab || (activeTab.url && activeTab.url.startsWith('chrome://'))) {
         exportStatus.innerText = 'Cannot export from this page.';
         exportStatus.style.color = '#ef4444';
         return;
