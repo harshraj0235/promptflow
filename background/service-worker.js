@@ -124,49 +124,26 @@ CRITICAL RULES: Return ONLY the raw enhanced prompt text. NO markdown formatting
 
     const seed = Math.floor(Math.random() * 1000000);
     
-    // Use openai model mapping (the legacy endpoint defaults to a fast model internally)
-    const payload = {
-      model: "openai", 
-      messages: [
-        { role: "system", content: masterPrompt },
-        { role: "user", content: request.text }
-      ],
-      seed: seed,
-      temperature: 0.3
-    };
+    const promptQuery = masterPrompt + "\n\nUser Input: " + request.text;
+    const url = "https://text.pollinations.ai/" + encodeURIComponent(promptQuery) + "?model=openai&seed=" + seed;
 
-    // Robust exponential backoff retry mechanism for million-user scale
-    async function fetchWithRetry(url, options, retries = 3, backoff = 1000) {
+    async function fetchWithRetry(url, retries = 3, backoff = 1000) {
       for (let i = 0; i < retries; i++) {
         try {
-          const res = await fetch(url, options);
-          if (res.ok || res.status < 500) return res; // Return success or non-retryable errors immediately
-          if (i === retries - 1) return res;
+          const res = await fetch(url);
+          if (res.ok || res.status < 500) return res;
         } catch (err) {
           if (i === retries - 1) throw err;
         }
-        // Wait before retrying: 1s, then 2s, then 4s
         await new Promise(r => setTimeout(r, backoff * Math.pow(2, i)));
       }
     }
 
-    fetchWithRetry('https://text.pollinations.ai/openai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }, 3)
+    fetchWithRetry(url, 3)
       .then(async res => {
-        if (!res.ok) {
-           const errText = await res.text();
-           let errMsg = errText;
-           try {
-             const json = JSON.parse(errText);
-             if (json.error) errMsg = json.error;
-           } catch(e) {}
-           throw new Error(errMsg || `Server returned ${res.status}`);
-        }
-        const data = await res.json();
-        return data.choices[0].message.content;
+        if (!res.ok) throw new Error(`Server returned ${res.status}`);
+        // The GET endpoint returns raw text, not JSON!
+        return await res.text();
       })
       .then(enhancedText => {
         // Strip any residual headers and strip markdown bold asterisks just in case
