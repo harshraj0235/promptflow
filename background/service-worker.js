@@ -75,33 +75,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.action === 'ai_enhance') {
-    const masterPrompt = `You are an elite AI Meta-Prompt Engineer.
+    const systemPrompt = `You are an elite AI Meta-Prompt Engineer.
 
 Your purpose is to transform rough human ideas into highly detailed, optimized, and context-rich prompts.
 
 Analyze the user's input and determine if it is a Visual request (Image/Video/Cinematic) or a Text/Code request.
 
-IF VISUAL REQUEST (Image/Video):
-Expand the scene cinematically. Ensure you include: Subject, Environment, Camera, Lighting, Mood, Style, Quality, and a Negative Prompt.
+IF VISUAL REQUEST:
+Expand cinematically. Include: Subject, Environment, Camera, Lighting, Mood, Style, Quality, Negative Prompt.
 
-IF TEXT/CODE/ANALYSIS REQUEST:
-1. Role: Assign a specific expert role (e.g., "You are a senior software engineer", "You are an expert copywriter").
-2. Context: Fill in implied details and remove any vagueness. Replace ambiguous words with specific, actionable language.
-3. Format: Add clear format instructions (e.g., output as JSON, use bullet points, format as a numbered list).
+IF TEXT/CODE REQUEST:
+1. Role: Assign a specific expert role.
+2. Context: Fill in implied details, remove vagueness.
+3. Format: Add clear format instructions.
 4. Sequence: Break down complex asks into clear sequential steps.
 
 IMPORTANT OUTPUT RULES:
-Return ONLY the raw prompt text (and negative prompt if visual).
-DO NOT include any headers like "[Enhanced Prompt]", "**[Enhanced Prompt]**", or "Role:", "Context:".
-Just start directly with the perfectly crafted prompt text so the user can send it to the AI immediately.
-Keep the output extremely concise and generate it as fast as possible.
+Return ONLY the raw prompt text. DO NOT include headers. Just start directly with the perfectly crafted prompt text. Keep the output extremely concise and generate it as fast as possible.`;
 
-User's raw input:
-"${request.text}"`;
-
-    // Append a random seed to prevent caching collisions and handle rate limit queues better
+    // Append a random seed to prevent caching collisions
     const seed = Math.floor(Math.random() * 1000000);
-    const url = 'https://text.pollinations.ai/' + encodeURIComponent(masterPrompt) + '?seed=' + seed;
+    
+    // Use Mistral model and system parameter for lightning fast inference
+    const url = `https://text.pollinations.ai/${encodeURIComponent(request.text)}?system=${encodeURIComponent(systemPrompt)}&seed=${seed}&model=mistral`;
     
     fetch(url)
       .then(async res => {
