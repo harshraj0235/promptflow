@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       vaultFolderFilter.innerHTML = '<option value="All">All Folders</option>';
       folders.forEach(f => {
         const selected = currentFolderFilter === f ? 'selected' : '';
-        vaultFolderFilter.innerHTML += \`<option value="\${f}" \${selected}>\${f}</option>\`;
+        vaultFolderFilter.innerHTML += `<option value="${f}" ${selected}>${f}</option>`;
       });
 
       // Filter
@@ -73,15 +73,15 @@ document.addEventListener('DOMContentLoaded', () => {
       prompts.forEach((p, index) => {
         const item = document.createElement('div');
         item.className = 'prompt-item';
-        const folderBadge = p.folder && p.folder !== 'Uncategorized' ? \`<span style="font-size:10px; padding:2px 6px; background:#e0e7ff; color:#3730a3; border-radius:4px; margin-bottom:4px; display:inline-block;">\${p.folder}</span><br>\` : '';
-        item.innerHTML = \`
-          \${folderBadge}
-          <p style="margin-top:0;">\${p.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+        const folderBadge = p.folder && p.folder !== 'Uncategorized' ? `<span style="font-size:10px; padding:2px 6px; background:#e0e7ff; color:#3730a3; border-radius:4px; margin-bottom:4px; display:inline-block;">${p.folder}</span><br>` : '';
+        item.innerHTML = `
+          ${folderBadge}
+          <p style="margin-top:0;">${p.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-            <span style="font-size:12px; color:#f59e0b; cursor:pointer;" class="star-rating" data-id="\${p.id}">\${'★'.repeat(p.rating || 0)}\${'☆'.repeat(5 - (p.rating || 0))}</span>
-            <button class="delete-btn" data-id="\${p.id}" title="Delete">✕</button>
+            <span style="font-size:12px; color:#f59e0b; cursor:pointer;" class="star-rating" data-id="${p.id}">${'★'.repeat(p.rating || 0)}${'☆'.repeat(5 - (p.rating || 0))}</span>
+            <button class="delete-btn" data-id="${p.id}" title="Delete">✕</button>
           </div>
-        \`;
+        `;
         
         item.addEventListener('click', (e) => {
           if(e.target.classList.contains('delete-btn') || e.target.classList.contains('star-rating')) return;
