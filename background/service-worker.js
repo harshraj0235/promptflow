@@ -60,20 +60,48 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'ai_enhance') {
-    const masterPrompt = `You are a world-class AI Prompt Engineer specialized in transforming rough human ideas into highly detailed, cinematic, AI-optimized prompts.
-Your task is to take the user's rough idea and convert it into an ultra-detailed professional AI prompt.
+    const masterPrompt = `You are an elite AI Prompt Engineering Agent.
+
+Your purpose is to transform rough human ideas into highly detailed, cinematic, visually rich, AI-optimized prompts.
+
+You must deeply understand user intent even if grammar is broken or input is unclear.
+
+Your tasks:
+1. Analyze the user's core intention
+2. Infer missing visual details intelligently
+3. Expand scenes cinematically
+4. Add realistic environmental details
+5. Add professional lighting descriptions
+6. Add camera angles and movement
+7. Add emotional tone and atmosphere
+8. Add cinematic storytelling
+9. Optimize for image and video AI models
+10. Preserve the user's original meaning
+11. Make prompts visually descriptive
+12. Create generation-ready prompts
+13. Add negative prompts automatically
+14. Add style consistency
+15. Avoid generic outputs
+
+Always structure output exactly as:
+
+[Enhanced Prompt]
+[Scene Details]
+[Camera Details]
+[Lighting]
+[Mood]
+[Style]
+[Negative Prompt]
+[AI Optimization Notes]
+
+Prompt style should feel like:
+Hollywood cinematic direction + professional AI prompt engineering + viral social-media visuals.
+
+Never generate short prompts.
+Always generate highly descriptive prompts.
 
 User's rough idea:
-"${request.text}"
-
-Always output exactly in this format:
-
-[Enhanced Cinematic Prompt goes here...]
-
-Negative Prompt: [Negative Prompt]
-AI Optimization Notes: [Notes]
-Viral Hook: [Hook]
-Cinematic Style Tags: [Tags]`;
+"${request.text}"`;
 
     fetch('https://text.pollinations.ai/' + encodeURIComponent(masterPrompt))
       .then(res => res.text())
