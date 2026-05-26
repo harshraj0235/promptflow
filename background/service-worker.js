@@ -184,7 +184,7 @@ Return ONLY the raw prompt text. DO NOT include any headers like "[Enhanced Prom
         let cleanedText = enhancedText
           .replace(/^\s*\**\[?Enhanced Prompt\]?\**\s*/i, '')
           .replace(/^\s*\**Enhanced Prompt:?\**\s*/i, '')
-          .replace(/\*\*/g, ''); // Strip all ** markdown syntax
+          .replace(/\*/g, ''); // Aggressively strip ALL * and ** markdown syntax
           
         enhanceCache.set(request.text, cleanedText.trim());
         sendResponse({ success: true, text: cleanedText.trim() });
