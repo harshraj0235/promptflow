@@ -1,3 +1,5 @@
+let enhanceCache = new Map();
+
 chrome.runtime.onInstalled.addListener(() => {
   console.log('PromptFlow Pro Installed');
   // Set up side panel behavior
@@ -112,40 +114,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.action === 'ai_enhance') {
-    const masterPrompt = `You are an elite AI Meta-Prompt Engineer.
+    if (enhanceCache.has(request.text)) {
+      sendResponse({ success: true, text: enhanceCache.get(request.text) });
+      return true;
+    }
 
+    const masterPrompt = `You are an elite AI Meta-Prompt Engineer.
 Your purpose is to transform rough human ideas into highly detailed, optimized, and context-rich prompts.
 
-Analyze the user's input and determine if it is a Visual request (Image/Video/Cinematic) or a Text/Code request.
+IF TEXT/CODE REQUEST:
+1. Role: Assign a specific expert role.
+2. Context: Fill in implied details. Remove ambiguity.
+3. Format: Add clear format instructions.
+4. Chain of Thought: Force the AI to think step-by-step before answering.
 
-IF VISUAL REQUEST (Image/Video):
-Expand the scene cinematically. Ensure you include: Subject, Environment, Camera, Lighting, Mood, Style, Quality, and a Negative Prompt.
+IF VISUAL REQUEST: Include Subject, Environment, Lighting, Style, Quality, and a Negative Prompt.
 
-IF TEXT/CODE/ANALYSIS REQUEST:
-1. Role: Assign a specific expert role (e.g., "You are a senior software engineer", "You are an expert copywriter").
-2. Context: Fill in implied details and remove any vagueness. Replace ambiguous words with specific, actionable language.
-3. Format: Add clear format instructions (e.g., output as JSON, use bullet points, format as a numbered list).
-4. Sequence: Break down complex asks into clear sequential steps.
+CRITICAL OUTPUT RULES:
+Return ONLY the raw prompt text. DO NOT include any headers like "[Enhanced Prompt]". DO NOT use any Markdown formatting like bold (**). Start directly with the prompt text so the user can send it instantly.`;
 
-IMPORTANT OUTPUT RULES:
-Return ONLY the raw prompt text (and negative prompt if visual).
-DO NOT include any headers like "[Enhanced Prompt]", "**[Enhanced Prompt]**", or "Role:", "Context:".
-CRITICAL: DO NOT use ANY Markdown formatting in your output. No asterisks (** or *). Output plain text only.
-Just start directly with the perfectly crafted prompt text so the user can send it to the AI immediately.
-Keep the output extremely concise and generate it as fast as possible.`;
-
-    // Append a random seed to prevent caching collisions and handle rate limit queues better
     const seed = Math.floor(Math.random() * 1000000);
     
-    // Use POST endpoint with 'openai' model (maps to fast gpt-4o-mini) for production-scale speed
+    // Switch to Llama for lightning-fast latency
     const payload = {
-      model: "openai", 
+      model: "llama", 
       messages: [
         { role: "system", content: masterPrompt },
         { role: "user", content: request.text }
       ],
       seed: seed,
-      temperature: 0.5
+      temperature: 0.3
     };
 
     // Robust exponential backoff retry mechanism for million-user scale
@@ -188,7 +186,7 @@ Keep the output extremely concise and generate it as fast as possible.`;
           .replace(/^\s*\**Enhanced Prompt:?\**\s*/i, '')
           .replace(/\*\*/g, ''); // Strip all ** markdown syntax
           
-          
+        enhanceCache.set(request.text, cleanedText.trim());
         sendResponse({ success: true, text: cleanedText.trim() });
       })
       .catch(err => {
