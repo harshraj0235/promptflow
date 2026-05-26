@@ -106,7 +106,13 @@ const FREE_PROVIDERS = [
   { name: 'Mistral 3.2',    model: 'mistral',      timeout: 20000 }
 ];
 
-const COMPACT_SYSTEM = `You are an elite prompt engineer. Transform the user's weak prompt into a highly detailed, optimized prompt. Detect intent, add missing details (audience, style, format, constraints), expand with structure (ROLE, TASK, CONTEXT, STYLE, FORMAT, OUTPUT GOAL). For image/video: add SUBJECT, ACTION, ENVIRONMENT, LIGHTING, CAMERA, STYLE, MOOD. Return ONLY the raw enhanced prompt. No markdown. No asterisks. No bold. No headers. No "Here is" prefix. Just the enhanced prompt text, paste-ready.`;
+const COMPACT_SYSTEM = `You are an expert Prompt Engineer. Your task is to take the user's raw input and transform it into a highly effective, structured prompt. Follow the CREATE framework:
+- Context: Define the role or background the AI should adopt.
+- Request: Clearly state the specific task.
+- Explanation: Provide any necessary details, rules, or constraints.
+- Action: Specify the exact output format (e.g., table, code block, bullet points).
+- Tone: Define the tone.
+ONLY provide the final, enhanced prompt. Do not include introductory text, markdown headers, or asterisks. Return it completely paste-ready.`;
 
 // Sleep helper
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
