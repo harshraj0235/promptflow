@@ -93,6 +93,7 @@ IF TEXT/CODE/ANALYSIS REQUEST:
 IMPORTANT OUTPUT RULES:
 Return ONLY the raw prompt text (and negative prompt if visual).
 DO NOT include any headers like "[Enhanced Prompt]", "**[Enhanced Prompt]**", or "Role:", "Context:".
+CRITICAL: DO NOT use ANY Markdown formatting in your output. No asterisks (** or *). Output plain text only.
 Just start directly with the perfectly crafted prompt text so the user can send it to the AI immediately.
 Keep the output extremely concise and generate it as fast as possible.
 
@@ -117,10 +118,12 @@ User's raw input:
         return res.text();
       })
       .then(enhancedText => {
-        // Strip any residual headers just in case
+        // Strip any residual headers and strip markdown bold asterisks just in case
         let cleanedText = enhancedText
           .replace(/^\s*\**\[?Enhanced Prompt\]?\**\s*/i, '')
-          .replace(/^\s*\**Enhanced Prompt:?\**\s*/i, '');
+          .replace(/^\s*\**Enhanced Prompt:?\**\s*/i, '')
+          .replace(/\*\*/g, ''); // Strip all ** markdown syntax
+          
           
         sendResponse({ success: true, text: cleanedText.trim() });
       })
