@@ -97,12 +97,12 @@ function createInlineButton() {
 function updateButtonPosition() {
   if (!btnContainer || !activeInput) return;
   const rect = activeInput.getBoundingClientRect();
-  if (rect.width === 0 || rect.height === 0 || rect.top < 0 || rect.bottom > window.innerHeight) {
+  if (rect.width === 0 || rect.height === 0 || rect.top > window.innerHeight + 50) {
     btnContainer.style.display = 'none';
     return;
   }
   btnContainer.style.display = 'flex';
-  btnContainer.style.top = (rect.bottom - 46) + 'px';
+  btnContainer.style.top = (rect.top - 46) + 'px';
   btnContainer.style.left = (rect.right - 190) + 'px'; // Adjust for two buttons
 }
 
@@ -115,7 +115,7 @@ const observer = new MutationObserver((mutations) => {
     inputs.forEach(input => {
       const rect = input.getBoundingClientRect();
       const area = rect.width * rect.height;
-      if (rect.width > 200 && rect.height > 20 && area > maxArea) {
+      if (rect.width > 100 && rect.height >= 10 && area > maxArea) {
         maxArea = area;
         bestInput = input;
       }
