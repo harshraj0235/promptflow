@@ -223,12 +223,12 @@ function renderCommandPalette(query) {
       item.className = 'pf-cmd-item';
       
       const title = p.content.substring(0, 40) + (p.content.length > 40 ? '...' : '');
-      const folderBadge = p.folder && p.folder !== 'Uncategorized' ? \`<span class="pf-cmd-item-folder">\${p.folder}</span>\` : '';
+      const folderBadge = p.folder && p.folder !== 'Uncategorized' ? `<span class="pf-cmd-item-folder">${p.folder}</span>` : '';
       
-      item.innerHTML = \`
-        <div class="pf-cmd-item-title">\${folderBadge}\${title}</div>
-        <div class="pf-cmd-item-content">\${p.content.substring(0, 80).replace(/</g, '&lt;')}</div>
-      \`;
+      item.innerHTML = `
+        <div class="pf-cmd-item-title">${folderBadge}${title}</div>
+        <div class="pf-cmd-item-content">${p.content.substring(0, 80).replace(/</g, '&lt;')}</div>
+      `;
       
       item.addEventListener('click', () => {
         if (activeInput) {
