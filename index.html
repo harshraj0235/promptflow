@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptFlow Pro - Get Better AI Responses in One Click</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-tertiary: #1a1a2e;
+      --text-primary: #f8f9fa;
+      --text-secondary: #a0a0b8;
+      --accent-primary: #6C5CE7;
+      --accent-secondary: #a855f7;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 5%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo span {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 100px 5% 60px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      background: linear-gradient(to right, #fff, #a0a0b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 20px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      text-decoration: none;
+      padding: 16px 32px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(108, 92, 231, 0.5);
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: white;
+      text-decoration: none;
+      padding: 16px 32px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+
+    .secondary-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .platforms {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 60px;
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .stat-item h3 {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--accent-secondary);
+    }
+
+    .stat-item p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .features {
+      padding: 100px 5%;
+      background-color: var(--bg-secondary);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .section-header p {
+      font-size: 18px;
+      color: var(--text-secondary);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      padding: 40px 30px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      border-color: var(--accent-primary);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-icon {
+      font-size: 40px;
+      margin-bottom: 24px;
+      display: inline-block;
+      text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+    }
+
+    .feature-card h3 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-list li {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-primary);
+    }
+
+    .feature-list li::before {
+      content: '✓';
+      color: var(--accent-secondary);
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    footer a {
+      color: var(--accent-secondary);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">⚡ <span>PromptFlow Pro</span></div>
+  </nav>
+
+  <section class="hero">
+    <h1>Get Better AI Responses<br>in One Click</h1>
+    <p>PromptFlow Pro enhances your AI experience with powerful prompt engineering tools, a curated prompt library, and seamless conversation export across all major AI platforms.</p>
+    
+    <div class="cta-buttons">
+      <a href="#" class="primary-btn">Add to Chrome</a>
+      <a href="#" class="secondary-btn">Watch Demo</a>
+    </div>
+    
+    <p class="platforms">Also available on Edge & Firefox</p>
+
+    <div class="stats">
+      <div class="stat-item">
+        <h3>4.5★</h3>
+        <p>Chrome Web Store</p>
+      </div>
+      <div class="stat-item">
+        <h3>10,000+</h3>
+        <p>Users</p>
+      </div>
+      <div class="stat-item">
+        <h3>100%</h3>
+        <p>Free</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="section-header">
+      <h2>How PromptFlow Pro Enhances Your Experience</h2>
+      <p>Everything you need to get the most out of AI, all in one extension.</p>
+    </div>
+
+    <div class="feature-grid">
+      
+      <!-- Feature 1 -->
+      <div class="feature-card">
+        <div class="feature-icon">🛠️</div>
+        <h3>Prompt Engineering Tools</h3>
+        <p>Craft better prompts using our Chrome extension or API playground. Get instant suggestions and refinements powered by advanced prompt engineering techniques.</p>
+        <ul class="feature-list">
+          <li>One-click prompt enhancement</li>
+          <li>Custom prompt curation</li>
+          <li>Advanced AI techniques</li>
+        </ul>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-card">
+        <div class="feature-icon">🗂️</div>
+        <h3>Prompt Library & Organization</h3>
+        <p>Access our daily-updated collection of engineered prompts, and organize your personal prompts in custom folders.</p>
+        <ul class="feature-list">
+          <li>Daily updated templates</li>
+          <li>Custom folders</li>
+          <li>Save & reuse favorites</li>
+        </ul>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>Cross-Platform Chat Export</h3>
+        <p>Export conversations between ChatGPT, Claude, Perplexity, Gemini, and Deepseek with intelligent summaries.</p>
+        <ul class="feature-list">
+          <li>Seamless AI switching</li>
+          <li>Intelligent summaries</li>
+          <li>Bypass usage limits & track work in chat</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 PromptFlow Pro. View our <a href="privacy.html">Privacy Policy</a>.</p>
+  </footer>
+
+</body>
+</html>
