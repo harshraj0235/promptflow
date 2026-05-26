@@ -231,20 +231,64 @@ function renderCommandPalette(query) {
       `;
       
       item.addEventListener('click', () => {
-        if (activeInput) {
+        if (!activeInput) {
+           alert("PromptFlow Pro: Please click inside a chat text box first!");
+           return;
+        }
+        
+        const regex = /\{\{([^}]+)\}\}/g;
+        const matches = [...p.content.matchAll(regex)].map(m => m[1]);
+        const uniqueVars = [...new Set(matches)];
+
+        function injectText(textToInject) {
            if (activeInput.tagName === 'TEXTAREA' || activeInput.tagName === 'INPUT') {
-             activeInput.value = p.content;
+             activeInput.value = textToInject;
            } else {
-             activeInput.innerText = p.content;
+             activeInput.innerText = textToInject;
            }
            activeInput.dispatchEvent(new Event('input', { bubbles: true }));
            cmdPalette.style.display = 'none';
-           
-           // Track usage
            try { chrome.runtime.sendMessage({ action: 'track_usage' }); } catch(e) {}
-        } else {
-           alert("PromptFlow Pro: Please click inside a chat text box first!");
         }
+
+        if (uniqueVars.length > 0) {
+          cmdList.innerHTML = `<div style="padding:16px; color:white;">
+            <h3 style="margin-top:0;margin-bottom:12px;font-size:14px;color:#a855f7;">Fill Variables</h3>
+            <div id="pf-vars-container" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+            <button id="pf-vars-submit" style="background:#3b82f6;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;width:100%;font-weight:bold;">Insert Prompt</button>
+            <button id="pf-vars-cancel" style="background:transparent;color:#9ca3af;border:none;padding:8px;cursor:pointer;width:100%;margin-top:4px;">Cancel</button>
+          </div>`;
+          
+          const container = document.getElementById('pf-vars-container');
+          uniqueVars.forEach(v => {
+            container.innerHTML += `
+              <div style="display:flex; flex-direction:column;">
+                <label style="font-size:11px;color:#d1d5db;margin-bottom:4px;">${v}</label>
+                <input type="text" class="pf-var-input" data-var="${v}" style="padding:8px;border-radius:6px;border:1px solid #4b5563;background:#374151;color:white;font-family:inherit;" />
+              </div>
+            `;
+          });
+          
+          const firstInput = document.querySelector('.pf-var-input');
+          if(firstInput) firstInput.focus();
+
+          document.getElementById('pf-vars-cancel').addEventListener('click', () => {
+            renderCommandPalette(document.getElementById('pf-cmd-search').value.toLowerCase());
+          });
+
+          document.getElementById('pf-vars-submit').addEventListener('click', () => {
+            let finalPrompt = p.content;
+            document.querySelectorAll('.pf-var-input').forEach(inp => {
+              const varName = inp.getAttribute('data-var');
+              const val = inp.value || `{{${varName}}}`;
+              finalPrompt = finalPrompt.split(`{{${varName}}}`).join(val);
+            });
+            injectText(finalPrompt);
+          });
+          return;
+        }
+
+        injectText(p.content);
       });
       
       cmdList.appendChild(item);
