@@ -42,7 +42,17 @@ function createInlineButton() {
     inlineBtn.innerHTML = '⏳...';
     
     setTimeout(() => {
-      const enhanced = `Act as an expert in this domain. Task: ${text}\nPlease provide a detailed, well-structured response.`;
+      const enhanced = `You are a world-class expert. Please perform the following task:
+
+<task>
+${text}
+</task>
+
+Before answering, please:
+1. Think step-by-step and lay out your logical reasoning.
+2. Consider any critical edge cases or important context.
+
+Please provide a highly detailed, accurate, and logically structured response. Ensure the tone is professional, clear, and the formatting uses clean Markdown (bullet points, bold text, and code blocks where necessary).`;
       
       // Update input
       if (activeInput.tagName === 'TEXTAREA' || activeInput.tagName === 'INPUT') {
