@@ -99,4 +99,35 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Export Chat Listener
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'export_chat') {
+    let markdown = "# PromptFlow Chat Export\\n\\n";
+    
+    // Universal "best effort" scrape for common AI chat structures
+    // Tries to look for common article/prose elements or specific ChatGPT classes
+    const blocks = document.querySelectorAll('article, .prose, [data-message-author-role]');
+    
+    if (blocks.length === 0) {
+      // Fallback: Just grab the whole body text if no specific blocks found
+      markdown += document.body.innerText;
+    } else {
+      blocks.forEach((block, i) => {
+        let role = "Message";
+        if (block.hasAttribute('data-message-author-role')) {
+           role = block.getAttribute('data-message-author-role') === 'user' ? 'User' : 'AI';
+        } else if (i % 2 === 0) {
+           role = "User";
+        } else {
+           role = "AI";
+        }
+        
+        markdown += `### ${role}\\n${block.innerText}\\n\\n---\\n\\n`;
+      });
+    }
+    
+    sendResponse({ success: true, markdown: markdown });
+  }
+});
+
 initialize();

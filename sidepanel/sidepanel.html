@@ -13,62 +13,77 @@
       <span class="logo-icon">✨</span>
       <h1>PromptFlow <span class="pro">Pro</span></h1>
     </div>
+    <button id="btn-back" class="icon-btn hidden" title="Go Back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
   </header>
 
-  <main>
+  <!-- View: Home -->
+  <main id="view-home" class="view active">
     <p class="subtitle">Your ultimate AI productivity suite.</p>
-
     <div class="feature-grid">
-      
-      <div class="feature-card" id="btn-vault">
-        <div class="card-icon blue">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-        </div>
-        <div class="card-content">
-          <h3>Saved Prompts</h3>
-          <p>Access your curated template library</p>
-        </div>
+      <div class="feature-card" data-target="view-vault">
+        <div class="card-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></div>
+        <div class="card-content"><h3>Saved Prompts</h3><p>Access your curated template library</p></div>
       </div>
-
-      <div class="feature-card" id="btn-craft">
-        <div class="card-icon purple">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
-        </div>
-        <div class="card-content">
-          <h3>Craft (Pollinations)</h3>
-          <p>Generate highly optimized prompts</p>
-        </div>
+      <div class="feature-card" data-target="view-craft">
+        <div class="card-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg></div>
+        <div class="card-content"><h3>Craft (Pollinations)</h3><p>Generate highly optimized prompts</p></div>
       </div>
-
-      <div class="feature-card" id="btn-export">
-        <div class="card-icon green">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-        </div>
-        <div class="card-content">
-          <h3>Export Chat</h3>
-          <p>Export conversation cross-platform</p>
-        </div>
+      <div class="feature-card" data-target="view-export">
+        <div class="card-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
+        <div class="card-content"><h3>Export Chat</h3><p>Export conversation cross-platform</p></div>
       </div>
-
-      <div class="feature-card" id="btn-settings">
-        <div class="card-icon orange">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
-        </div>
-        <div class="card-content">
-          <h3>Features & Settings</h3>
-          <p>Configure shortcuts and models</p>
-        </div>
+      <div class="feature-card" data-target="view-settings">
+        <div class="card-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg></div>
+        <div class="card-content"><h3>Settings</h3><p>Configure shortcuts and data</p></div>
       </div>
-
     </div>
   </main>
 
-  <script>
-    document.querySelectorAll('.feature-card').forEach(card => {
-      card.addEventListener('click', () => {
-        alert("PromptFlow Pro: " + card.querySelector('h3').innerText + " launched!");
-      });
-    });
-  </script>
+  <!-- View: Vault -->
+  <main id="view-vault" class="view">
+    <div class="view-header"><h2>Saved Prompts</h2></div>
+    <div class="input-group">
+      <textarea id="vault-new-input" placeholder="Paste a prompt here to save it..."></textarea>
+      <button id="vault-save-btn" class="primary-btn">Save Prompt</button>
+    </div>
+    <div id="vault-list" class="prompt-list"></div>
+  </main>
+
+  <!-- View: Craft -->
+  <main id="view-craft" class="view">
+    <div class="view-header"><h2>Craft Prompt</h2></div>
+    <div class="input-group">
+      <textarea id="craft-input" placeholder="Type a rough idea... (e.g. 'write an email to boss about vacation')"></textarea>
+      <button id="craft-btn" class="primary-btn">✨ Enhance</button>
+    </div>
+    <div class="result-group hidden" id="craft-result-group">
+      <textarea id="craft-output" readonly></textarea>
+      <button id="craft-copy-btn" class="secondary-btn">Copy to Clipboard</button>
+    </div>
+  </main>
+
+  <!-- View: Export -->
+  <main id="view-export" class="view">
+    <div class="view-header"><h2>Export Chat</h2></div>
+    <div class="card-info">
+      <p>Extracts the current conversation from ChatGPT, Claude, Gemini, or Perplexity as a Markdown document.</p>
+    </div>
+    <button id="export-btn" class="primary-btn full-width" style="margin-top:16px;">Download Chat (.md)</button>
+    <div id="export-status" class="status-msg"></div>
+  </main>
+
+  <!-- View: Settings -->
+  <main id="view-settings" class="view">
+    <div class="view-header"><h2>Settings</h2></div>
+    <div class="card-info">
+      <p><strong>Keyboard Shortcuts:</strong></p>
+      <p><kbd>Ctrl+M</kbd> or <kbd>Cmd+M</kbd> to enhance prompt directly in any AI chat box.</p>
+    </div>
+    <button id="settings-clear-btn" class="danger-btn full-width" style="margin-top:24px;">Clear Saved Prompts</button>
+  </main>
+
+  <script src="sidepanel.js"></script>
 </body>
 </html>
