@@ -30,7 +30,57 @@ class FloatingToolbar {
 
     // Enhance Text
     buttons[1].addEventListener('click', () => {
-      alert("PromptFlow Pro: Select text to enhance it.");
+      let activeInput = document.activeElement;
+      if (!activeInput || (activeInput.tagName !== 'TEXTAREA' && activeInput.tagName !== 'INPUT' && !activeInput.isContentEditable)) {
+         const inputs = document.querySelectorAll('textarea, [contenteditable="true"]');
+         let maxArea = 0;
+         inputs.forEach(input => {
+            const rect = input.getBoundingClientRect();
+            const area = rect.width * rect.height;
+            if (area > maxArea) {
+               maxArea = area;
+               activeInput = input;
+            }
+         });
+      }
+
+      if (!activeInput) {
+        alert("PromptFlow Pro: Could not find an input field.");
+        return;
+      }
+
+      const text = activeInput.value || activeInput.innerText;
+      if (!text.trim()) {
+        alert("PromptFlow Pro: Please type a prompt first to enhance it.");
+        return;
+      }
+      
+      const originalIcon = buttons[1].innerHTML;
+      buttons[1].innerHTML = '⏳';
+      
+      chrome.runtime.sendMessage({ action: 'ai_enhance', text: text }, (response) => {
+        buttons[1].innerHTML = originalIcon;
+        
+        if (chrome.runtime.lastError || !response || !response.success) {
+           console.error("Enhancement failed:", chrome.runtime.lastError || response?.error);
+           alert("PromptFlow Pro: Failed to reach AI enhancer. Please check console.");
+           return;
+        }
+        
+        const enhanced = response.text;
+        
+        if (activeInput.tagName === 'TEXTAREA' || activeInput.tagName === 'INPUT') {
+          activeInput.value = enhanced;
+        } else {
+          activeInput.innerText = enhanced;
+        }
+        
+        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+        activeInput.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        const tracker = activeInput._valueTracker;
+        if (tracker) tracker.setValue('');
+      });
     });
 
     // Quick Save
