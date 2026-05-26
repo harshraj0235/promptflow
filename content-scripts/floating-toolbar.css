@@ -173,3 +173,40 @@
 .pf-icon-btn:hover {
   background: rgba(59, 130, 246, 0.1);
 }
+
+/* Secondary Inline Save Button */
+.pf-inline-save-btn {
+  background: white;
+  color: #3b82f6;
+  border: 1px solid #e5e7eb;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  pointer-events: auto;
+}
+
+.pf-inline-save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  background: #f9fafb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pf-inline-save-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .pf-inline-save-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+}

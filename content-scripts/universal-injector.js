@@ -54,14 +54,10 @@ function createInlineButton() {
 
   const saveBtn = document.createElement('button');
   saveBtn.id = 'pf-universal-save-btn';
-  saveBtn.className = 'pf-inline-enhance-btn';
+  saveBtn.className = 'pf-inline-save-btn';
   saveBtn.innerHTML = '💾 Save';
   saveBtn.title = 'Save to Vault';
   saveBtn.type = 'button';
-  
-  // Style override for secondary save button
-  saveBtn.style.background = 'rgba(255,255,255,0.1)';
-  saveBtn.style.color = 'white';
 
   saveBtn.addEventListener('click', (e) => {
     e.preventDefault(); e.stopPropagation();
