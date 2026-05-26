@@ -28,95 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  // ═══ AI Provider Settings ═══
-  const providerSelect = document.getElementById('ai-provider-select');
-  const freeInfo = document.getElementById('free-info');
-  const geminiCard = document.getElementById('gemini-key-card');
-  const groqCard = document.getElementById('groq-key-card');
-  const openaiCard = document.getElementById('openai-key-card');
-  const geminiKeyInput = document.getElementById('gemini-api-key');
-  const groqKeyInput = document.getElementById('groq-api-key');
-  const openaiKeyInput = document.getElementById('openai-api-key');
-  const saveProviderBtn = document.getElementById('save-provider-btn');
-
-  function updateProviderUI(value) {
-    freeInfo.style.display = value === 'auto' ? 'flex' : 'none';
-    geminiCard.style.display = value === 'gemini' ? 'block' : 'none';
-    groqCard.style.display = value === 'groq' ? 'block' : 'none';
-    openaiCard.style.display = value === 'openai' ? 'block' : 'none';
-  }
-
-  providerSelect.addEventListener('change', (e) => {
-    updateProviderUI(e.target.value);
-  });
-
-  // Load saved provider settings
-  chrome.storage.sync.get(['aiProvider', 'geminiApiKey', 'groqApiKey', 'openaiApiKey'], (res) => {
-    if (res.aiProvider) {
-      providerSelect.value = res.aiProvider;
-      updateProviderUI(res.aiProvider);
+  // ═══ Theme Settings ═══
+  chrome.storage.sync.get('theme', (res) => {
+    if (res.theme) {
+      themeSelect.value = res.theme;
+      document.documentElement.setAttribute('data-theme', res.theme);
     }
-    if (res.geminiApiKey) geminiKeyInput.value = res.geminiApiKey;
-    if (res.groqApiKey) groqKeyInput.value = res.groqApiKey;
-    if (res.openaiApiKey) openaiKeyInput.value = res.openaiApiKey;
-  });
-
-  // Save provider settings
-  saveProviderBtn.addEventListener('click', () => {
-    const provider = providerSelect.value;
-    const settings = { aiProvider: provider };
-
-    if (provider === 'gemini') {
-      const key = geminiKeyInput.value.trim();
-      if (!key) {
-        showToast('Please enter your Gemini API key', 'error');
-        geminiKeyInput.focus();
-        return;
-      }
-      settings.geminiApiKey = key;
-    } else if (provider === 'groq') {
-      const key = groqKeyInput.value.trim();
-      if (!key) {
-        showToast('Please enter your Groq API key', 'error');
-        groqKeyInput.focus();
-        return;
-      }
-      settings.groqApiKey = key;
-    } else if (provider === 'openai') {
-      const key = openaiKeyInput.value.trim();
-      if (!key) {
-        showToast('Please enter your OpenAI API key', 'error');
-        openaiKeyInput.focus();
-        return;
-      }
-      settings.openaiApiKey = key;
-    }
-
-    chrome.storage.sync.set(settings, () => {
-      saveProviderBtn.textContent = '✅ Saved!';
-      saveProviderBtn.classList.add('saved');
-      showToast('AI Provider settings saved!');
-      setTimeout(() => {
-        saveProviderBtn.textContent = '💾 Save AI Provider Settings';
-        saveProviderBtn.classList.remove('saved');
-      }, 2000);
-    });
-  });
-
-  // Toggle API key visibility
-  document.getElementById('gemini-toggle-visibility').addEventListener('click', () => {
-    const isPassword = geminiKeyInput.type === 'password';
-    geminiKeyInput.type = isPassword ? 'text' : 'password';
-  });
-
-  document.getElementById('groq-toggle-visibility').addEventListener('click', () => {
-    const isPassword = groqKeyInput.type === 'password';
-    groqKeyInput.type = isPassword ? 'text' : 'password';
-  });
-
-  document.getElementById('openai-toggle-visibility').addEventListener('click', () => {
-    const isPassword = openaiKeyInput.type === 'password';
-    openaiKeyInput.type = isPassword ? 'text' : 'password';
   });
 
   // ═══ General Settings ═══

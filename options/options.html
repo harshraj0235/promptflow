@@ -42,108 +42,13 @@
       <!-- AI PROVIDER SECTION -->
       <section id="ai-provider" class="settings-section active">
         <h2>AI Provider</h2>
-        <p class="section-desc">Choose how PromptFlow enhances your prompts. The free option works out-of-the-box. Add your own API key for blazing speed.</p>
-
-        <!-- Provider Selector -->
-        <div class="setting-card provider-card">
-          <div class="setting-info">
-            <h3>Enhancement Engine</h3>
-            <p>Select which AI powers your prompt enhancement.</p>
-          </div>
-          <div class="setting-control">
-            <select id="ai-provider-select">
-              <option value="auto">🌐 Free Public Stack (Rate limits apply)</option>
-              <option value="gemini">✨ Google Gemini (BYOK — Free & Reliable)</option>
-              <option value="groq">⚡ Groq (Bring Your Own Key — Ultra Fast)</option>
-              <option value="openai">🤖 OpenAI (Bring Your Own Key — Premium)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Free Provider Info -->
-        <div class="info-card" id="free-info">
+        <div class="info-card">
           <div class="info-card-icon">🌐</div>
           <div class="info-card-content">
-            <h4>Free Multi-Provider Engine</h4>
-            <p>Uses 5 free AI models with automatic failover. No API key needed, no signup, no credit card. Scales to millions of users.</p>
-            <div class="provider-stack">
-              <span class="provider-chip">GPT-5 Nano</span>
-              <span class="provider-chip">Mistral 3.2</span>
-              <span class="provider-chip">DeepSeek V4</span>
-              <span class="provider-chip">Llama 4 Scout</span>
-              <span class="provider-chip">Nova Micro</span>
-            </div>
-            <p class="info-note">Response time: 2-5 seconds | Always free | Auto-failover if one model is down</p>
+            <h4>Pollinations AI Engine</h4>
+            <p>Your prompt enhancement is exclusively powered by Pollinations AI. This service uses powerful models with automatic retry logic, is completely free, and requires no API key.</p>
+            <p class="info-note">Response time: ~2-5 seconds | Always free | Anonymous</p>
           </div>
-        </div>
-
-        <!-- Gemini Key Input -->
-        <div class="api-key-card" id="gemini-key-card" style="display:none;">
-          <div class="api-key-header">
-            <div class="api-key-icon">✨</div>
-            <div>
-              <h4>Google Gemini API Key</h4>
-              <p>Get a generous free tier key at <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link">aistudio.google.com</a></p>
-            </div>
-          </div>
-          <div class="api-key-input-wrapper">
-            <input type="password" id="gemini-api-key" class="api-key-input" placeholder="AIzaSy..." autocomplete="off" spellcheck="false" />
-            <button id="gemini-toggle-visibility" class="toggle-vis-btn" title="Show/Hide">👁️</button>
-          </div>
-          <div class="api-key-features">
-            <span class="feature-tag speed">✨ Extremely reliable</span>
-            <span class="feature-tag">Free tier: 15 req/min</span>
-            <span class="feature-tag">No credit card needed</span>
-          </div>
-        </div>
-
-        <!-- Groq Key Input -->
-        <div class="api-key-card" id="groq-key-card" style="display:none;">
-          <div class="api-key-header">
-            <div class="api-key-icon">⚡</div>
-            <div>
-              <h4>Groq API Key</h4>
-              <p>Get your free key at <a href="https://console.groq.com/keys" target="_blank" class="link">console.groq.com</a></p>
-            </div>
-          </div>
-          <div class="api-key-input-wrapper">
-            <input type="password" id="groq-api-key" class="api-key-input" placeholder="gsk_xxxxxxxxxxxx" autocomplete="off" spellcheck="false" />
-            <button id="groq-toggle-visibility" class="toggle-vis-btn" title="Show/Hide">👁️</button>
-          </div>
-          <div class="api-key-features">
-            <span class="feature-tag speed">⚡ Sub-second responses</span>
-            <span class="feature-tag">Free tier: 30 req/min</span>
-            <span class="feature-tag">No credit card needed</span>
-          </div>
-        </div>
-
-        <!-- OpenAI Key Input -->
-        <div class="api-key-card" id="openai-key-card" style="display:none;">
-          <div class="api-key-header">
-            <div class="api-key-icon">🤖</div>
-            <div>
-              <h4>OpenAI API Key</h4>
-              <p>Get your key at <a href="https://platform.openai.com/api-keys" target="_blank" class="link">platform.openai.com</a></p>
-            </div>
-          </div>
-          <div class="api-key-input-wrapper">
-            <input type="password" id="openai-api-key" class="api-key-input" placeholder="sk-xxxxxxxxxxxx" autocomplete="off" spellcheck="false" />
-            <button id="openai-toggle-visibility" class="toggle-vis-btn" title="Show/Hide">👁️</button>
-          </div>
-          <div class="api-key-features">
-            <span class="feature-tag premium">🤖 GPT-4o-mini quality</span>
-            <span class="feature-tag">Pay-as-you-go</span>
-            <span class="feature-tag">~1-2s responses</span>
-          </div>
-        </div>
-
-        <!-- Save Button -->
-        <button class="save-provider-btn" id="save-provider-btn">💾 Save AI Provider Settings</button>
-
-        <!-- Security Note -->
-        <div class="security-note">
-          <span>🔒</span>
-          <span>Your API keys are stored securely in Chrome's encrypted sync storage. They never leave your browser and are never sent to our servers.</span>
         </div>
       </section>
 

@@ -160,81 +160,6 @@ async function callPollinations(text, tone, model, timeoutMs) {
   }
 }
 
-// BYOK: Groq (sub-second responses)
-async function callGroq(text, apiKey) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
-
-  try {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-          { role: 'system', content: MASTER_SYSTEM_PROMPT },
-          { role: 'user', content: text }
-        ],
-        max_tokens: 1200, temperature: 0.7
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timer);
-    if (!res.ok) throw new Error(`Groq ${res.status}`);
-    const data = await res.json();
-    return data.choices[0].message.content.trim();
-  } catch (e) { clearTimeout(timer); throw e; }
-}
-
-// BYOK: OpenAI
-async function callOpenAI(text, apiKey) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 12000);
-
-  try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: MASTER_SYSTEM_PROMPT },
-          { role: 'user', content: text }
-        ],
-        max_tokens: 1200, temperature: 0.7
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timer);
-    if (!res.ok) throw new Error(`OpenAI ${res.status}`);
-    const data = await res.json();
-    return data.choices[0].message.content.trim();
-  } catch (e) { clearTimeout(timer); throw e; }
-}
-
-// BYOK: Google Gemini (Best Free Tier)
-async function callGemini(text, tone, apiKey) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 12000);
-
-  try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: { text: getSystemPrompt(tone) } },
-        contents: [{ parts: [{ text: text }] }],
-        generationConfig: { maxOutputTokens: 1200, temperature: 0.7 }
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timer);
-    if (!res.ok) throw new Error(`Gemini ${res.status}`);
-    const data = await res.json();
-    return data.candidates[0].content.parts[0].text.trim();
-  } catch (e) { clearTimeout(timer); throw e; }
-}
-
 // ═══════════════════════════════════════════════════════════════
 // CLEANUP — Strip any markdown artifacts from AI output
 // ═══════════════════════════════════════════════════════════════
@@ -254,40 +179,11 @@ function cleanText(raw) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MAIN ENHANCE — Multi-provider with auto-failover
+// MAIN ENHANCE — Pollinations Only
 // ═══════════════════════════════════════════════════════════════
 
 async function enhancePrompt(text, tone, settings) {
-  const provider = settings.aiProvider || 'auto';
   const startTime = Date.now();
-
-  // BYOK first if configured
-  if (provider === 'gemini' && settings.geminiApiKey) {
-    try {
-      const result = await callGemini(text, tone, settings.geminiApiKey);
-      return { text: cleanText(result), provider: 'Gemini (Free)', time: Date.now() - startTime };
-    } catch (e) {
-      console.warn('PromptFlow: Gemini BYOK failed, falling back...', e.message);
-    }
-  }
-
-  if (provider === 'groq' && settings.groqApiKey) {
-    try {
-      const result = await callGroq(text, settings.groqApiKey);
-      return { text: cleanText(result), provider: 'Groq', time: Date.now() - startTime };
-    } catch (e) {
-      console.warn('PromptFlow: Groq BYOK failed, falling back...', e.message);
-    }
-  }
-
-  if (provider === 'openai' && settings.openaiApiKey) {
-    try {
-      const result = await callOpenAI(text, settings.openaiApiKey);
-      return { text: cleanText(result), provider: 'OpenAI', time: Date.now() - startTime };
-    } catch (e) {
-      console.warn('PromptFlow: OpenAI BYOK failed, falling back...', e.message);
-    }
-  }
 
   // FREE STACK — Try each provider until one succeeds (with retry logic for Queue Full)
   const errors = [];
