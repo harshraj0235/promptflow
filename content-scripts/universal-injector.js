@@ -2,7 +2,7 @@
 console.log("PromptFlow Pro: Universal Injector active");
 
 function initialize() {
-  // Production version uses strictly inline buttons via universal-injector
+  injectCommandPalette();
 }
 
 let activeInput = null;
@@ -48,6 +48,8 @@ function createInlineButton() {
         activeInput.dispatchEvent(new Event('change', { bubbles: true }));
         const tracker = activeInput._valueTracker;
         if (tracker) tracker.setValue('');
+        
+        try { chrome.runtime.sendMessage({ action: 'track_usage' }); } catch(e) {}
       });
     } catch (err) {
       inlineBtn.innerHTML = '✨ Enhance';
@@ -133,6 +135,7 @@ window.addEventListener('resize', updateButtonPosition);
 setInterval(updateButtonPosition, 500);
 
 document.addEventListener('keydown', (e) => {
+  // Enhance Shortcut (Ctrl+M)
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'm') {
     e.preventDefault();
     if (btnContainer && btnContainer.style.display !== 'none') {
@@ -140,7 +143,114 @@ document.addEventListener('keydown', (e) => {
       if (btn) btn.click();
     }
   }
+  
+  // Command Palette Shortcut (Ctrl+Shift+P)
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'p') {
+    e.preventDefault();
+    e.stopPropagation();
+    openCommandPalette();
+  }
 });
+
+let cmdPalette = null;
+let cmdList = null;
+
+function injectCommandPalette() {
+  if (document.getElementById('pf-command-palette')) return;
+  
+  cmdPalette = document.createElement('div');
+  cmdPalette.id = 'pf-command-palette';
+  cmdPalette.className = 'pf-cmd-palette-overlay';
+  cmdPalette.style.display = 'none';
+  
+  cmdPalette.innerHTML = `
+    <div class="pf-cmd-modal" id="pf-cmd-modal">
+      <div class="pf-cmd-header">
+        <span class="pf-cmd-logo">⚡ PF</span>
+        <input type="text" id="pf-cmd-search" class="pf-cmd-search" placeholder="Search your Vault..." autocomplete="off" />
+      </div>
+      <div class="pf-cmd-list" id="pf-cmd-list"></div>
+    </div>
+  `;
+  document.body.appendChild(cmdPalette);
+  
+  cmdList = document.getElementById('pf-cmd-list');
+  const searchInput = document.getElementById('pf-cmd-search');
+  
+  // Close on background click
+  cmdPalette.addEventListener('click', (e) => {
+    if (e.target === cmdPalette) cmdPalette.style.display = 'none';
+  });
+  
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && cmdPalette.style.display === 'flex') {
+      cmdPalette.style.display = 'none';
+    }
+  });
+
+  searchInput.addEventListener('input', (e) => {
+    renderCommandPalette(e.target.value.toLowerCase());
+  });
+}
+
+function openCommandPalette() {
+  if (!cmdPalette) injectCommandPalette();
+  cmdPalette.style.display = 'flex';
+  const searchInput = document.getElementById('pf-cmd-search');
+  searchInput.value = '';
+  searchInput.focus();
+  renderCommandPalette('');
+}
+
+function renderCommandPalette(query) {
+  if (!cmdList) return;
+  chrome.storage.local.get(['savedPrompts'], (res) => {
+    const prompts = res.savedPrompts || [];
+    // Convert legacy strings to objects implicitly for display if needed
+    const normalized = prompts.map(p => typeof p === 'string' ? { content: p, folder: 'Uncategorized' } : p);
+    
+    const filtered = normalized.filter(p => p.content.toLowerCase().includes(query) || (p.folder && p.folder.toLowerCase().includes(query)));
+    
+    cmdList.innerHTML = '';
+    if (filtered.length === 0) {
+      cmdList.innerHTML = '<div class="pf-cmd-item" style="text-align:center;color:#999;">No prompts found.</div>';
+      return;
+    }
+    
+    filtered.slice(0, 15).forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'pf-cmd-item';
+      
+      const title = p.content.substring(0, 40) + (p.content.length > 40 ? '...' : '');
+      const folderBadge = p.folder && p.folder !== 'Uncategorized' ? \`<span class="pf-cmd-item-folder">\${p.folder}</span>\` : '';
+      
+      item.innerHTML = \`
+        <div class="pf-cmd-item-title">\${folderBadge}\${title}</div>
+        <div class="pf-cmd-item-content">\${p.content.substring(0, 80).replace(/</g, '&lt;')}</div>
+      \`;
+      
+      item.addEventListener('click', () => {
+        if (activeInput) {
+           if (activeInput.tagName === 'TEXTAREA' || activeInput.tagName === 'INPUT') {
+             activeInput.value = p.content;
+           } else {
+             activeInput.innerText = p.content;
+           }
+           activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+           cmdPalette.style.display = 'none';
+           
+           // Track usage
+           try { chrome.runtime.sendMessage({ action: 'track_usage' }); } catch(e) {}
+        } else {
+           alert("PromptFlow Pro: Please click inside a chat text box first!");
+        }
+      });
+      
+      cmdList.appendChild(item);
+    });
+  });
+}
 
 // Export Chat Listener
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

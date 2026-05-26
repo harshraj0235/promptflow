@@ -42,16 +42,17 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "save-to-promptflow") {
     // Save selection as prompt
-    chrome.storage.local.get(['prompts'], (res) => {
-      const prompts = res.prompts || [];
-      prompts.push({
+    chrome.storage.local.get(['savedPrompts'], (res) => {
+      const prompts = res.savedPrompts || [];
+      prompts.unshift({
         id: Date.now().toString(),
-        title: 'Saved from ' + (tab ? tab.title : 'Web'),
         content: info.selectionText,
-        tags: ['saved'],
+        folder: 'Clippings',
+        rating: 0,
+        usageCount: 0,
         createdAt: new Date().toISOString()
       });
-      chrome.storage.local.set({ prompts });
+      chrome.storage.local.set({ savedPrompts: prompts });
     });
   } else if (info.menuItemId === "enhance-with-promptflow") {
     console.log("Enhance:", info.selectionText);
@@ -62,14 +63,50 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'save_prompt') {
     chrome.storage.local.get(['savedPrompts'], (res) => {
       const prompts = res.savedPrompts || [];
-      if (!prompts.includes(request.text)) {
-        prompts.unshift(request.text);
-        chrome.storage.local.set({ savedPrompts: prompts }, () => {
+      
+      // MIGRATION: convert old string prompts to v2 structured objects
+      const migrated = prompts.map(p => typeof p === 'string' ? {
+        id: Date.now() + Math.random().toString(),
+        content: p,
+        folder: 'Uncategorized',
+        rating: 0,
+        usageCount: 0,
+        createdAt: new Date().toISOString()
+      } : p);
+
+      const exists = migrated.find(p => p.content === request.text);
+      if (!exists) {
+        migrated.unshift({
+          id: Date.now().toString(),
+          content: request.text,
+          folder: request.folder || 'Uncategorized',
+          rating: 0,
+          usageCount: 0,
+          createdAt: new Date().toISOString()
+        });
+        chrome.storage.local.set({ savedPrompts: migrated }, () => {
           sendResponse({ success: true });
         });
       } else {
         sendResponse({ success: true }); // Already saved
       }
+    });
+    return true;
+  }
+
+  // Analytics Tracker
+  if (request.action === 'track_usage') {
+    chrome.storage.local.get(['analytics'], (res) => {
+      const analytics = res.analytics || { promptsUsedToday: 0, timeSavedSeconds: 0, lastDate: new Date().toDateString() };
+      const today = new Date().toDateString();
+      if (analytics.lastDate !== today) {
+         analytics.promptsUsedToday = 0;
+         analytics.timeSavedSeconds = 0;
+         analytics.lastDate = today;
+      }
+      analytics.promptsUsedToday += 1;
+      analytics.timeSavedSeconds += 180; // Estimate 3 mins saved per use
+      chrome.storage.local.set({ analytics }, () => sendResponse({ success: true }));
     });
     return true;
   }
