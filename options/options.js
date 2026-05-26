@@ -31,14 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // ═══ AI Provider Settings ═══
   const providerSelect = document.getElementById('ai-provider-select');
   const freeInfo = document.getElementById('free-info');
+  const geminiCard = document.getElementById('gemini-key-card');
   const groqCard = document.getElementById('groq-key-card');
   const openaiCard = document.getElementById('openai-key-card');
+  const geminiKeyInput = document.getElementById('gemini-api-key');
   const groqKeyInput = document.getElementById('groq-api-key');
   const openaiKeyInput = document.getElementById('openai-api-key');
   const saveProviderBtn = document.getElementById('save-provider-btn');
 
   function updateProviderUI(value) {
     freeInfo.style.display = value === 'auto' ? 'flex' : 'none';
+    geminiCard.style.display = value === 'gemini' ? 'block' : 'none';
     groqCard.style.display = value === 'groq' ? 'block' : 'none';
     openaiCard.style.display = value === 'openai' ? 'block' : 'none';
   }
@@ -48,11 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Load saved provider settings
-  chrome.storage.sync.get(['aiProvider', 'groqApiKey', 'openaiApiKey'], (res) => {
+  chrome.storage.sync.get(['aiProvider', 'geminiApiKey', 'groqApiKey', 'openaiApiKey'], (res) => {
     if (res.aiProvider) {
       providerSelect.value = res.aiProvider;
       updateProviderUI(res.aiProvider);
     }
+    if (res.geminiApiKey) geminiKeyInput.value = res.geminiApiKey;
     if (res.groqApiKey) groqKeyInput.value = res.groqApiKey;
     if (res.openaiApiKey) openaiKeyInput.value = res.openaiApiKey;
   });
@@ -62,7 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const provider = providerSelect.value;
     const settings = { aiProvider: provider };
 
-    if (provider === 'groq') {
+    if (provider === 'gemini') {
+      const key = geminiKeyInput.value.trim();
+      if (!key) {
+        showToast('Please enter your Gemini API key', 'error');
+        geminiKeyInput.focus();
+        return;
+      }
+      settings.geminiApiKey = key;
+    } else if (provider === 'groq') {
       const key = groqKeyInput.value.trim();
       if (!key) {
         showToast('Please enter your Groq API key', 'error');
@@ -92,6 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Toggle API key visibility
+  document.getElementById('gemini-toggle-visibility').addEventListener('click', () => {
+    const isPassword = geminiKeyInput.type === 'password';
+    geminiKeyInput.type = isPassword ? 'text' : 'password';
+  });
+
   document.getElementById('groq-toggle-visibility').addEventListener('click', () => {
     const isPassword = groqKeyInput.type === 'password';
     groqKeyInput.type = isPassword ? 'text' : 'password';

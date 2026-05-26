@@ -211,26 +211,43 @@ async function callOpenAI(text, apiKey) {
   } catch (e) { clearTimeout(timer); throw e; }
 }
 
+// BYOK: Google Gemini (Best Free Tier)
+async function callGemini(text, apiKey) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: { text: COMPACT_SYSTEM } },
+        contents: [{ parts: [{ text: text }] }],
+        generationConfig: { maxOutputTokens: 1200, temperature: 0.7 }
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error(`Gemini ${res.status}`);
+    const data = await res.json();
+    return data.candidates[0].content.parts[0].text.trim();
+  } catch (e) { clearTimeout(timer); throw e; }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // CLEANUP — Strip any markdown artifacts from AI output
 // ═══════════════════════════════════════════════════════════════
 
 function cleanText(raw) {
   return raw
-    // Remove "Here's your enhanced prompt:" type prefixes
     .replace(/^[\s]*(Here(?:'s| is) (?:the |your )?(enhanced|improved|optimized|rewritten|expanded) prompt:?[\s]*)/i, '')
     .replace(/^[\s]*\**Enhanced Prompt:?\**[\s]*/i, '')
     .replace(/^[\s]*\**\[?Enhanced Prompt\]?\**[\s]*/i, '')
-    // Remove markdown bold/italic
     .replace(/\*\*/g, '')
     .replace(/(?<![a-zA-Z0-9])\*(?!\*)/g, '')
-    // Remove markdown headers
     .replace(/^#{1,6}\s*/gm, '')
-    // Remove horizontal rules
     .replace(/^[-]{3,}$/gm, '')
-    // Remove wrapping quotes
     .replace(/^["']|["']$/g, '')
-    // Clean up excessive newlines
     .replace(/\n{4,}/g, '\n\n\n')
     .trim();
 }
@@ -244,6 +261,15 @@ async function enhancePrompt(text, settings) {
   const startTime = Date.now();
 
   // BYOK first if configured
+  if (provider === 'gemini' && settings.geminiApiKey) {
+    try {
+      const result = await callGemini(text, settings.geminiApiKey);
+      return { text: cleanText(result), provider: 'Gemini (Free)', time: Date.now() - startTime };
+    } catch (e) {
+      console.warn('PromptFlow: Gemini BYOK failed, falling back...', e.message);
+    }
+  }
+
   if (provider === 'groq' && settings.groqApiKey) {
     try {
       const result = await callGroq(text, settings.groqApiKey);
@@ -264,6 +290,8 @@ async function enhancePrompt(text, settings) {
 
   // FREE STACK — Try each provider until one succeeds
   const errors = [];
+  let rateLimitHit = false;
+
   for (const prov of FREE_PROVIDERS) {
     try {
       console.log(`PromptFlow: Trying ${prov.name}...`);
@@ -275,9 +303,14 @@ async function enhancePrompt(text, settings) {
       errors.push(`${prov.name}: ${e.message}`);
       console.warn(`PromptFlow: ${prov.name} failed —`, e.message);
       if (e.message === 'RATE_LIMIT' || e.message.includes('429')) {
+          rateLimitHit = true;
           await delay(1500); // Give the queue time to clear before trying next provider
       }
     }
+  }
+
+  if (rateLimitHit) {
+    throw new Error(`The free public AI is currently overloaded for your network (Rate Limited).\n\n💡 Fix: Open PromptFlow Settings and add a FREE Google Gemini or Groq API key for unlimited, lightning-fast enhancements!`);
   }
 
   throw new Error(`All providers failed. Details:\n${errors.join('\n')}`);

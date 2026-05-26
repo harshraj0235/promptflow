@@ -52,7 +52,8 @@
           </div>
           <div class="setting-control">
             <select id="ai-provider-select">
-              <option value="auto">🌐 Free (Pollinations — No Key Needed)</option>
+              <option value="auto">🌐 Free Public Stack (Rate limits apply)</option>
+              <option value="gemini">✨ Google Gemini (BYOK — Free & Reliable)</option>
               <option value="groq">⚡ Groq (Bring Your Own Key — Ultra Fast)</option>
               <option value="openai">🤖 OpenAI (Bring Your Own Key — Premium)</option>
             </select>
@@ -73,6 +74,26 @@
               <span class="provider-chip">Nova Micro</span>
             </div>
             <p class="info-note">Response time: 2-5 seconds | Always free | Auto-failover if one model is down</p>
+          </div>
+        </div>
+
+        <!-- Gemini Key Input -->
+        <div class="api-key-card" id="gemini-key-card" style="display:none;">
+          <div class="api-key-header">
+            <div class="api-key-icon">✨</div>
+            <div>
+              <h4>Google Gemini API Key</h4>
+              <p>Get a generous free tier key at <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link">aistudio.google.com</a></p>
+            </div>
+          </div>
+          <div class="api-key-input-wrapper">
+            <input type="password" id="gemini-api-key" class="api-key-input" placeholder="AIzaSy..." autocomplete="off" spellcheck="false" />
+            <button id="gemini-toggle-visibility" class="toggle-vis-btn" title="Show/Hide">👁️</button>
+          </div>
+          <div class="api-key-features">
+            <span class="feature-tag speed">✨ Extremely reliable</span>
+            <span class="feature-tag">Free tier: 15 req/min</span>
+            <span class="feature-tag">No credit card needed</span>
           </div>
         </div>
 
