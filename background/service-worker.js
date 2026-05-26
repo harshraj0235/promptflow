@@ -97,8 +97,7 @@ CRITICAL OUTPUT RULES:
 
 // ═══════════════════════════════════════════════════════════════
 // FREE PROVIDER STACK — Auto-failover, zero cost, scales to millions
-// Uses text.pollinations.ai (free, no auth needed)
-// gen.pollinations.ai now requires auth — DO NOT USE for free tier
+// Uses text.pollinations.ai POST endpoint (free, no auth needed)
 // ═══════════════════════════════════════════════════════════════
 
 const FREE_PROVIDERS = [
@@ -109,38 +108,12 @@ const FREE_PROVIDERS = [
   { name: 'Llama 3.3',      model: 'llama',        timeout: 15000 },
 ];
 
-// Compact system instruction for GET URL (URL length limit)
 const COMPACT_SYSTEM = `You are an elite prompt engineer. Transform the user's weak prompt into a highly detailed, optimized prompt. Detect intent, add missing details (audience, style, format, constraints), expand with structure (ROLE, TASK, CONTEXT, STYLE, FORMAT, OUTPUT GOAL). For image/video: add SUBJECT, ACTION, ENVIRONMENT, LIGHTING, CAMERA, STYLE, MOOD. Return ONLY the raw enhanced prompt. No markdown. No asterisks. No bold. No headers. No "Here is" prefix. Just the enhanced prompt text, paste-ready.`;
 
-// PRIMARY: GET endpoint (simplest, fastest, most reliable for free)
-async function callPollinationsGET(text, model, timeoutMs) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+// Sleep helper
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const fullPrompt = COMPACT_SYSTEM + "\n\nUser prompt to enhance:\n" + text;
-  const seed = Math.floor(Math.random() * 999999);
-  const url = "https://text.pollinations.ai/" + encodeURIComponent(fullPrompt) + "?model=" + model + "&seed=" + seed;
-
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timer);
-
-    if (!res.ok) {
-      const errBody = await res.text().catch(() => '');
-      throw new Error(`HTTP ${res.status}: ${errBody.substring(0, 150)}`);
-    }
-
-    const result = await res.text();
-    if (!result || result.trim().length < 10) throw new Error('Empty response');
-    return result.trim();
-  } catch (e) {
-    clearTimeout(timer);
-    throw e;
-  }
-}
-
-// BACKUP: POST endpoint (for when GET URL is too long)
-async function callPollinationsPOST(text, model, timeoutMs) {
+async function callPollinations(text, model, timeoutMs, isRetry = false) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -162,6 +135,9 @@ async function callPollinationsPOST(text, model, timeoutMs) {
     clearTimeout(timer);
 
     if (!res.ok) {
+      if (res.status === 429) {
+        throw new Error('RATE_LIMIT');
+      }
       const errBody = await res.text().catch(() => '');
       throw new Error(`HTTP ${res.status}: ${errBody.substring(0, 150)}`);
     }
@@ -171,30 +147,14 @@ async function callPollinationsPOST(text, model, timeoutMs) {
     return data.choices[0].message.content.trim();
   } catch (e) {
     clearTimeout(timer);
-    throw e;
-  }
-}
-
-// Smart caller: tries GET first (fast), falls back to POST if URL too long
-async function callPollinations(text, model, timeoutMs) {
-  const fullPrompt = COMPACT_SYSTEM + "\n\nUser prompt to enhance:\n" + text;
-  const estimatedUrlLength = 30 + encodeURIComponent(fullPrompt).length + model.length + 20;
-
-  // If URL would be too long (>4000 chars), use POST directly
-  if (estimatedUrlLength > 4000) {
-    return await callPollinationsPOST(text, model, timeoutMs);
-  }
-
-  // Try GET first (fastest)
-  try {
-    return await callPollinationsGET(text, model, timeoutMs);
-  } catch (e) {
-    // If GET fails with rate limit or error, try POST as backup
-    if (e.message.includes('429') || e.message.includes('Queue full')) {
-      console.log(`PromptFlow: GET rate-limited, trying POST for ${model}...`);
-      await new Promise(r => setTimeout(r, 1000)); // Brief pause
-      return await callPollinationsPOST(text, model, timeoutMs);
+    
+    // If it's a rate limit and we haven't retried yet, wait 2 seconds and try again
+    if (e.message === 'RATE_LIMIT' && !isRetry) {
+      console.log(`PromptFlow: Rate limited on ${model}. Waiting 2s before retry...`);
+      await delay(2000);
+      return await callPollinations(text, model, timeoutMs, true);
     }
+    
     throw e;
   }
 }
@@ -314,6 +274,9 @@ async function enhancePrompt(text, settings) {
     } catch (e) {
       errors.push(`${prov.name}: ${e.message}`);
       console.warn(`PromptFlow: ${prov.name} failed —`, e.message);
+      if (e.message === 'RATE_LIMIT' || e.message.includes('429')) {
+          await delay(1500); // Give the queue time to clear before trying next provider
+      }
     }
   }
 
