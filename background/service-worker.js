@@ -102,7 +102,7 @@ User's raw input:
 
     // Append a random seed to prevent caching collisions and handle rate limit queues better
     const seed = Math.floor(Math.random() * 1000000);
-    const url = 'https://text.pollinations.ai/' + encodeURIComponent(masterPrompt) + '?seed=' + seed;
+    const url = 'https://text.pollinations.ai/' + encodeURIComponent(masterPrompt) + '?seed=' + seed + '&model=mistral';
     
     fetch(url)
       .then(async res => {
