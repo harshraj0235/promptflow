@@ -52,7 +52,6 @@
         "*://x.com/i/grok*"
       ],
       "js": [
-        "content-scripts/floating-toolbar.js",
         "content-scripts/universal-injector.js"
       ],
       "css": [

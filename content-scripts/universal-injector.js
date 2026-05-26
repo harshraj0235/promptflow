@@ -2,9 +2,7 @@
 console.log("PromptFlow Pro: Universal Injector active");
 
 function initialize() {
-  if (window.PromptFlowToolbar) {
-    window.PromptFlowToolbar.inject();
-  }
+  // Production version uses strictly inline buttons via universal-injector
 }
 
 let activeInput = null;
