@@ -85,20 +85,16 @@ Your tasks:
 
 Always structure output exactly as:
 
-[Enhanced Prompt]
-[Scene Details]
-[Camera Details]
-[Lighting]
-[Mood]
-[Style]
-[Negative Prompt]
-[AI Optimization Notes]
+(The actual enhanced prompt text directly without any header)
 
-Prompt style should feel like:
-Hollywood cinematic direction + professional AI prompt engineering + viral social-media visuals.
+Negative Prompt:
+(The negative prompt text)
 
-Never generate short prompts.
-Always generate highly descriptive prompts.
+AI Optimization Notes:
+(Notes)
+
+IMPORTANT: DO NOT include the literal string "[Enhanced Prompt]" or "**[Enhanced Prompt]**" anywhere in your response. Just start directly with the prompt text.
+Keep the output extremely concise and generate it as fast as possible while maintaining cinematic quality.
 
 User's rough idea:
 "${request.text}"`;
@@ -106,7 +102,12 @@ User's rough idea:
     fetch('https://text.pollinations.ai/' + encodeURIComponent(masterPrompt))
       .then(res => res.text())
       .then(enhancedText => {
-        sendResponse({ success: true, text: enhancedText });
+        // Strip any residual headers just in case
+        let cleanedText = enhancedText
+          .replace(/^\s*\**\[?Enhanced Prompt\]?\**\s*/i, '')
+          .replace(/^\s*\**Enhanced Prompt:?\**\s*/i, '');
+          
+        sendResponse({ success: true, text: cleanedText.trim() });
       })
       .catch(err => {
         sendResponse({ success: false, error: err.message });
