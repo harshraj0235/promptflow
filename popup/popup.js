@@ -156,4 +156,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial load
   loadPrompts();
+
+  // Open Side Panel Button
+  const openPanelBtn = document.getElementById('open-panel-btn');
+  if (openPanelBtn) {
+    openPanelBtn.addEventListener('click', () => {
+      chrome.windows.getCurrent((window) => {
+        chrome.sidePanel.open({ windowId: window.id });
+      });
+    });
+  }
 });
