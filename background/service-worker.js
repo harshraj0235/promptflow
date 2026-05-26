@@ -101,11 +101,9 @@ CRITICAL OUTPUT RULES:
 // ═══════════════════════════════════════════════════════════════
 
 const FREE_PROVIDERS = [
-  { name: 'GPT-5 Nano',     model: 'openai-fast',  timeout: 12000 },
-  { name: 'OpenAI',         model: 'openai',       timeout: 15000 },
-  { name: 'Mistral 3.2',    model: 'mistral',      timeout: 15000 },
-  { name: 'DeepSeek V4',    model: 'deepseek',     timeout: 15000 },
-  { name: 'Llama 3.3',      model: 'llama',        timeout: 15000 },
+  { name: 'GPT-5 Nano',     model: 'openai-fast',  timeout: 15000 },
+  { name: 'OpenAI',         model: 'openai',       timeout: 20000 },
+  { name: 'Mistral 3.2',    model: 'mistral',      timeout: 20000 }
 ];
 
 const COMPACT_SYSTEM = `You are an elite prompt engineer. Transform the user's weak prompt into a highly detailed, optimized prompt. Detect intent, add missing details (audience, style, format, constraints), expand with structure (ROLE, TASK, CONTEXT, STYLE, FORMAT, OUTPUT GOAL). For image/video: add SUBJECT, ACTION, ENVIRONMENT, LIGHTING, CAMERA, STYLE, MOOD. Return ONLY the raw enhanced prompt. No markdown. No asterisks. No bold. No headers. No "Here is" prefix. Just the enhanced prompt text, paste-ready.`;
@@ -113,7 +111,7 @@ const COMPACT_SYSTEM = `You are an elite prompt engineer. Transform the user's w
 // Sleep helper
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function callPollinations(text, model, timeoutMs, isRetry = false) {
+async function callPollinations(text, model, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -147,14 +145,6 @@ async function callPollinations(text, model, timeoutMs, isRetry = false) {
     return data.choices[0].message.content.trim();
   } catch (e) {
     clearTimeout(timer);
-    
-    // If it's a rate limit and we haven't retried yet, wait 2 seconds and try again
-    if (e.message === 'RATE_LIMIT' && !isRetry) {
-      console.log(`PromptFlow: Rate limited on ${model}. Waiting 2s before retry...`);
-      await delay(2000);
-      return await callPollinations(text, model, timeoutMs, true);
-    }
-    
     throw e;
   }
 }
@@ -288,29 +278,33 @@ async function enhancePrompt(text, settings) {
     }
   }
 
-  // FREE STACK — Try each provider until one succeeds
+  // FREE STACK — Try each provider until one succeeds (with retry logic for Queue Full)
   const errors = [];
-  let rateLimitHit = false;
-
+  
   for (const prov of FREE_PROVIDERS) {
-    try {
-      console.log(`PromptFlow: Trying ${prov.name}...`);
-      const result = await callPollinations(text, prov.model, prov.timeout);
-      const elapsed = Date.now() - startTime;
-      console.log(`PromptFlow: ${prov.name} responded in ${elapsed}ms`);
-      return { text: cleanText(result), provider: prov.name, time: elapsed };
-    } catch (e) {
-      errors.push(`${prov.name}: ${e.message}`);
-      console.warn(`PromptFlow: ${prov.name} failed —`, e.message);
-      if (e.message === 'RATE_LIMIT' || e.message.includes('429')) {
-          rateLimitHit = true;
-          await delay(1500); // Give the queue time to clear before trying next provider
+    let retries = 2; // Allow up to 2 retries per model if queue is full
+    
+    while (retries >= 0) {
+      try {
+        console.log(`PromptFlow: Trying ${prov.name}... (Retries left: ${retries})`);
+        const result = await callPollinations(text, prov.model, prov.timeout);
+        const elapsed = Date.now() - startTime;
+        console.log(`PromptFlow: ${prov.name} responded in ${elapsed}ms`);
+        return { text: cleanText(result), provider: prov.name, time: elapsed };
+      } catch (e) {
+        if ((e.message === 'RATE_LIMIT' || e.message.includes('429')) && retries > 0) {
+            console.log(`Queue full for ${prov.name}, waiting 2 seconds...`);
+            await delay(2000);
+            retries--;
+            continue; // Retry same model
+        }
+        
+        // If it wasn't a rate limit, or we're out of retries, log error and break to next model
+        errors.push(`${prov.name}: ${e.message}`);
+        console.warn(`PromptFlow: ${prov.name} failed —`, e.message);
+        break; 
       }
     }
-  }
-
-  if (rateLimitHit) {
-    throw new Error(`The free public AI is currently overloaded for your network (Rate Limited).\n\n💡 Fix: Open PromptFlow Settings and add a FREE Google Gemini or Groq API key for unlimited, lightning-fast enhancements!`);
   }
 
   throw new Error(`All providers failed. Details:\n${errors.join('\n')}`);
