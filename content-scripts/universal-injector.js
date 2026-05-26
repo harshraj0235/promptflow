@@ -153,4 +153,19 @@ observer.observe(document.body, { childList: true, subtree: true });
 window.addEventListener('scroll', updateUIPosition, true);
 window.addEventListener('resize', updateUIPosition);
 setInterval(updateUIPosition, 500);
+
+// Add Ctrl+M / Cmd+M keyboard shortcut
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'm') {
+    e.preventDefault();
+    const craftBtn = document.getElementById('pf-btn-craft');
+    const pIcon = document.getElementById('pf-icon-p');
+    if (craftBtn) {
+      craftBtn.click();
+    } else if (pIcon) {
+      pIcon.click();
+    }
+  }
+});
+
 initialize();
