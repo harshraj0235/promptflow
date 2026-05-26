@@ -59,9 +59,9 @@
   cursor: default;
 }
 
-/* Inline Enhance Button inserted directly into the AI prompt input */
+/* Inline Enhance Button inside the glass pill */
 .pf-inline-enhance-btn {
-  background: linear-gradient(135deg, #6C5CE7, #a855f7);
+  background: linear-gradient(135deg, #a855f7, #6C5CE7);
   color: white;
   border: none;
   padding: 6px 14px;
@@ -70,19 +70,18 @@
   font-weight: 600;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
-  z-index: 2147483647; /* Ensure it floats above absolutely everything */
   display: flex;
   align-items: center;
-  gap: 4px;
-  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  gap: 6px;
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: auto;
 }
 
 .pf-inline-enhance-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.5);
-  background: linear-gradient(135deg, #5b4dd1, #9333ea);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.6);
+  background: linear-gradient(135deg, #9333ea, #5b4dd1);
 }
 
 /* Universal UI Container */
@@ -174,39 +173,25 @@
   background: rgba(59, 130, 246, 0.1);
 }
 
-/* Secondary Inline Save Button */
+/* Secondary Inline Save Button inside the glass pill */
 .pf-inline-save-btn {
-  background: white;
-  color: #3b82f6;
-  border: 1px solid #e5e7eb;
-  padding: 6px 14px;
+  background: transparent;
+  color: #d1d5db;
+  border: none;
+  padding: 6px 12px;
   border-radius: 20px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
-  z-index: 2147483647;
   display: flex;
   align-items: center;
-  gap: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  gap: 6px;
+  transition: all 0.2s ease;
   pointer-events: auto;
 }
 
 .pf-inline-save-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  background: #f9fafb;
-}
-
-@media (prefers-color-scheme: dark) {
-  .pf-inline-save-btn {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  .pf-inline-save-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-  }
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
 }

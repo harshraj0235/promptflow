@@ -102,8 +102,18 @@ function updateButtonPosition() {
     return;
   }
   btnContainer.style.display = 'flex';
-  btnContainer.style.top = (rect.top - 46) + 'px';
-  btnContainer.style.left = (rect.right - 190) + 'px'; // Adjust for two buttons
+  
+  // Sleek Pill Container Styling injected dynamically
+  btnContainer.style.background = 'rgba(26, 26, 46, 0.85)';
+  btnContainer.style.backdropFilter = 'blur(12px)';
+  btnContainer.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+  btnContainer.style.borderRadius = '30px';
+  btnContainer.style.padding = '4px 6px';
+  btnContainer.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.15)';
+  
+  // Position elegantly overlapping the top right border
+  btnContainer.style.top = (rect.top - 24) + 'px'; 
+  btnContainer.style.left = (rect.right - 210) + 'px';
 }
 
 const observer = new MutationObserver((mutations) => {
