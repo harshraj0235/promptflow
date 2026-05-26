@@ -19,6 +19,9 @@
         <a href="#ai-provider" class="nav-item active">
           <span class="nav-icon">🧠</span> AI Provider
         </a>
+        <a href="#personalization" class="nav-item">
+          <span class="nav-icon">👤</span> Personalization
+        </a>
         <a href="#general" class="nav-item">
           <span class="nav-icon">⚙️</span> General
         </a>
@@ -48,6 +51,42 @@
             <h4>Pollinations AI Engine</h4>
             <p>Your prompt enhancement is exclusively powered by Pollinations AI. This service uses powerful models with automatic retry logic, is completely free, and requires no API key.</p>
             <p class="info-note">Response time: ~2-5 seconds | Always free | Anonymous</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PERSONALIZATION -->
+      <section id="personalization" class="settings-section">
+        <h2>Personalization Dashboard</h2>
+        <p class="section-desc">Tune the AI to perfectly match your specific style, audience, and goals.</p>
+        
+        <div class="setting-card" style="align-items: flex-start; flex-direction: column;">
+          <div class="setting-info" style="margin-bottom: 12px; width: 100%;">
+            <h3>Target Audience</h3>
+            <p>Who is the default audience for your prompts? (e.g., Software Engineers, General Public, Executive Team)</p>
+          </div>
+          <div class="setting-control" style="width: 100%;">
+            <input type="text" id="pers-audience" placeholder="e.g. Beginners and Non-Technical Users" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #1a1a1a; color: #fff;">
+          </div>
+        </div>
+
+        <div class="setting-card" style="align-items: flex-start; flex-direction: column;">
+          <div class="setting-info" style="margin-bottom: 12px; width: 100%;">
+            <h3>Custom AI Persona & Writing Style</h3>
+            <p>Define exactly how the AI should write. This overrides basic Tone settings.</p>
+          </div>
+          <div class="setting-control" style="width: 100%;">
+            <textarea id="pers-style" placeholder="e.g. I want the AI to write like Naval Ravikant: extremely concise, highly philosophical, avoiding jargon, and never using emojis." style="width: 100%; height: 80px; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #1a1a1a; color: #fff; resize: vertical;"></textarea>
+          </div>
+        </div>
+
+        <div class="setting-card" style="align-items: flex-start; flex-direction: column;">
+          <div class="setting-info" style="margin-bottom: 12px; width: 100%;">
+            <h3>Auto Few-Shot Examples (Optional)</h3>
+            <p>Paste 1-2 examples of outputs you consider "Good" to heavily anchor the AI's behavior.</p>
+          </div>
+          <div class="setting-control" style="width: 100%;">
+            <textarea id="pers-examples" placeholder="Example 1:\n..." style="width: 100%; height: 100px; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #1a1a1a; color: #fff; resize: vertical;"></textarea>
           </div>
         </div>
       </section>

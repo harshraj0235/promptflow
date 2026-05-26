@@ -36,6 +36,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // ═══ Personalization Settings ═══
+  const persAudience = document.getElementById('pers-audience');
+  const persStyle = document.getElementById('pers-style');
+  const persExamples = document.getElementById('pers-examples');
+
+  chrome.storage.sync.get(['persAudience', 'persStyle', 'persExamples'], (res) => {
+    if (res.persAudience) persAudience.value = res.persAudience;
+    if (res.persStyle) persStyle.value = res.persStyle;
+    if (res.persExamples) persExamples.value = res.persExamples;
+  });
+
+  const savePersonalization = () => {
+    chrome.storage.sync.set({
+      persAudience: persAudience.value,
+      persStyle: persStyle.value,
+      persExamples: persExamples.value
+    }, () => showToast('Personalization saved!'));
+  };
+
+  // Use debounced input or blur to save automatically
+  persAudience.addEventListener('blur', savePersonalization);
+  persStyle.addEventListener('blur', savePersonalization);
+  persExamples.addEventListener('blur', savePersonalization);
+
   // ═══ General Settings ═══
   chrome.storage.local.get(['theme', 'defaultView'], (res) => {
     if (res.theme) {

@@ -130,9 +130,22 @@ Rules:
 3. At the very bottom of the prompt, append exactly this format: "Prompt Quality Score: [XX]/100" (where XX is your rigorous evaluation of the prompt's clarity, context, and constraints).
 4. Return ONLY the final polished prompt with the score attached. No conversational filler.`;
 
-function getPass1SystemPrompt(tone) {
-  if (!tone || tone === 'auto') return PASS1_SYSTEM;
-  return PASS1_SYSTEM + `\n\nCRITICAL INSTRUCTION: The user has explicitly requested to optimize this prompt for the following goal/tone: [${tone.toUpperCase()}]. Ensure the Tone and Context reflect this choice perfectly.`;
+function getPass1SystemPrompt(tone, settings = {}) {
+  let prompt = PASS1_SYSTEM;
+
+  if (settings.persAudience || settings.persStyle || settings.persExamples) {
+    prompt += `\n\n--- USER PERSONALIZATION PROFILE ---`;
+    if (settings.persAudience) prompt += `\nDEFAULT TARGET AUDIENCE: ${settings.persAudience}`;
+    if (settings.persStyle) prompt += `\nCUSTOM WRITING STYLE & PERSONA: ${settings.persStyle}\n(CRITICAL: You MUST adopt this persona and writing style strictly.)`;
+    if (settings.persExamples) prompt += `\nFEW-SHOT EXAMPLES OF "GOOD" OUTPUTS:\n${settings.persExamples}\n(CRITICAL: Anchor your enhancement tightly to these examples.)`;
+    prompt += `\n-----------------------------------`;
+  }
+
+  if (tone && tone !== 'auto') {
+    prompt += `\n\nCRITICAL INSTRUCTION: The user has explicitly requested to optimize this prompt for the following goal/tone: [${tone.toUpperCase()}]. Ensure the Tone and Context reflect this choice perfectly.`;
+  }
+  
+  return prompt;
 }
 
 // Sleep helper
@@ -199,7 +212,7 @@ async function enhancePrompt(text, tone, settings) {
     while (retries >= 0) {
       try {
         console.log(`PromptFlow: Pass 1 (Engineering) on ${prov.name}...`);
-        const pass1Result = await callPollinations(text, getPass1SystemPrompt(tone), prov.model);
+        const pass1Result = await callPollinations(text, getPass1SystemPrompt(tone, settings), prov.model);
         
         console.log(`PromptFlow: Pass 2 (Scoring & Refinement) on ${prov.name}...`);
         const pass2Result = await callPollinations(pass1Result, PASS2_SYSTEM, prov.model);
@@ -282,7 +295,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true;
     }
 
-    chrome.storage.sync.get(['aiProvider', 'geminiApiKey', 'groqApiKey', 'openaiApiKey'], (settings) => {
+    chrome.storage.sync.get(['persAudience', 'persStyle', 'persExamples'], (settings) => {
       enhancePrompt(request.text, tone, settings || {})
         .then(result => {
           enhanceCache.set(cacheKey, result.text);
