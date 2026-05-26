@@ -105,26 +105,39 @@ const FREE_PROVIDERS = [
   { name: 'Pollinations AI (Base)', model: 'openai',       timeout: 30000 }
 ];
 
-const COMPACT_SYSTEM = `You are an expert Prompt Engineer. Your task is to take the user's raw input and transform it into a highly effective, structured prompt. Follow the CREATE framework:
-- Context: Define the role or background the AI should adopt.
-- Request: Clearly state the specific task.
-- Explanation: Provide any necessary details, rules, or constraints.
-- Action: Specify the exact output format (e.g., table, code block, bullet points).
-- Tone: Define the tone.
-ONLY provide the final, enhanced prompt. Do not include introductory text, markdown headers, or asterisks. Return it completely paste-ready.`;
+const CRAFTED_PLUS_SYSTEM = `You are an elite Prompt Architect.
+
+Your task is to transform vague user input into a precise, optimized, high-performance AI prompt.
+
+Your objectives:
+- Infer user intent
+- Add missing clarity
+- Structure instructions logically
+- Define role/context
+- Specify output format
+- Add useful constraints
+- Improve reasoning instructions
+- Optimize for the selected AI model
+- Preserve original user intent exactly
+
+Rules:
+- Never change the core meaning
+- Never add unrelated assumptions
+- Reduce ambiguity
+- Maximize output quality
+- Make prompts production-ready
+
+Return ONLY the enhanced prompt. Do not include conversational filler like "Here is your prompt". Return it completely paste-ready.`;
 
 function getSystemPrompt(tone) {
-  if (!tone || tone === 'auto') return COMPACT_SYSTEM;
-  return COMPACT_SYSTEM + `\n\nCRITICAL INSTRUCTION: The user has explicitly requested to optimize this prompt for the following goal/tone: [${tone.toUpperCase()}]. Ensure the Context and Tone reflect this choice perfectly.`;
+  if (!tone || tone === 'auto') return CRAFTED_PLUS_SYSTEM;
+  return CRAFTED_PLUS_SYSTEM + `\n\nCRITICAL INSTRUCTION: The user has explicitly requested to optimize this prompt for the following goal/tone: [${tone.toUpperCase()}]. Ensure the Tone and Context reflect this choice perfectly.`;
 }
 
 // Sleep helper
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function callPollinations(text, tone, model, timeoutMs) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-
+async function callPollinations(text, tone, model) {
   try {
     const res = await fetch('https://text.pollinations.ai/openai/v1/chat/completions', {
       method: 'POST',
@@ -135,17 +148,12 @@ async function callPollinations(text, tone, model, timeoutMs) {
           { role: 'system', content: getSystemPrompt(tone) },
           { role: 'user', content: text }
         ],
-        max_tokens: 1200,
+        max_tokens: 1500,
         temperature: 0.7
-      }),
-      signal: controller.signal
+      })
     });
-    clearTimeout(timer);
 
     if (!res.ok) {
-      if (res.status === 429) {
-        throw new Error('RATE_LIMIT');
-      }
       const errBody = await res.text().catch(() => '');
       throw new Error(`HTTP ${res.status}: ${errBody.substring(0, 150)}`);
     }
@@ -154,7 +162,6 @@ async function callPollinations(text, tone, model, timeoutMs) {
     if (!data.choices?.[0]?.message) throw new Error('Invalid response structure');
     return data.choices[0].message.content.trim();
   } catch (e) {
-    clearTimeout(timer);
     throw e;
   }
 }
@@ -193,7 +200,7 @@ async function enhancePrompt(text, tone, settings) {
     while (retries >= 0) {
       try {
         console.log(`PromptFlow: Trying ${prov.name}... (Retries left: ${retries})`);
-        const result = await callPollinations(text, tone, prov.model, prov.timeout);
+        const result = await callPollinations(text, tone, prov.model);
         const elapsed = Date.now() - startTime;
         console.log(`PromptFlow: ${prov.name} responded in ${elapsed}ms`);
         return { text: cleanText(result), provider: prov.name, time: elapsed };
