@@ -34,22 +34,31 @@ function createInlineButton() {
     if (!text.trim()) { alert("PromptFlow Pro: Please type a prompt first."); return; }
     
     inlineBtn.innerHTML = '⏳ Enhancing...';
-    chrome.runtime.sendMessage({ action: 'ai_enhance', text: text }, (response) => {
+    try {
+      chrome.runtime.sendMessage({ action: 'ai_enhance', text: text }, (response) => {
+        inlineBtn.innerHTML = '✨ Enhance';
+        if (chrome.runtime.lastError || !response || !response.success) {
+           alert("PromptFlow Pro: Failed to reach AI enhancer.");
+           return;
+        }
+        if (activeInput.tagName === 'TEXTAREA' || activeInput.tagName === 'INPUT') {
+          activeInput.value = response.text;
+        } else {
+          activeInput.innerText = response.text;
+        }
+        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+        activeInput.dispatchEvent(new Event('change', { bubbles: true }));
+        const tracker = activeInput._valueTracker;
+        if (tracker) tracker.setValue('');
+      });
+    } catch (err) {
       inlineBtn.innerHTML = '✨ Enhance';
-      if (chrome.runtime.lastError || !response || !response.success) {
-         alert("PromptFlow Pro: Failed to reach AI enhancer.");
-         return;
-      }
-      if (activeInput.tagName === 'TEXTAREA' || activeInput.tagName === 'INPUT') {
-        activeInput.value = response.text;
+      if (err.message.includes('Extension context invalidated')) {
+        alert("PromptFlow Pro was just updated! Please refresh this page to continue using the extension.");
       } else {
-        activeInput.innerText = response.text;
+        console.error(err);
       }
-      activeInput.dispatchEvent(new Event('input', { bubbles: true }));
-      activeInput.dispatchEvent(new Event('change', { bubbles: true }));
-      const tracker = activeInput._valueTracker;
-      if (tracker) tracker.setValue('');
-    });
+    }
   });
 
   const saveBtn = document.createElement('button');
@@ -66,9 +75,18 @@ function createInlineButton() {
     if (!text.trim()) { alert("PromptFlow Pro: Please type a prompt to save."); return; }
     
     saveBtn.innerHTML = '✅ Saved';
-    chrome.runtime.sendMessage({ action: 'save_prompt', text: text }, () => {
-      setTimeout(() => saveBtn.innerHTML = '💾 Save', 2000);
-    });
+    try {
+      chrome.runtime.sendMessage({ action: 'save_prompt', text: text }, () => {
+        setTimeout(() => saveBtn.innerHTML = '💾 Save', 2000);
+      });
+    } catch (err) {
+      saveBtn.innerHTML = '💾 Save';
+      if (err.message.includes('Extension context invalidated')) {
+        alert("PromptFlow Pro was just updated! Please refresh this page to continue using the extension.");
+      } else {
+        console.error(err);
+      }
+    }
   });
 
   btnContainer.appendChild(saveBtn);
