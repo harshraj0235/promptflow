@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptFlow Pro - Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="options-container">
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <h1>PromptFlow <span class="pro">Pro</span></h1>
+      </div>
+      <nav class="settings-nav">
+        <a href="#general" class="nav-item active">General</a>
+        <a href="#appearance" class="nav-item">Appearance</a>
+        <a href="#platforms" class="nav-item">AI Platforms</a>
+        <a href="#data" class="nav-item">Data & Storage</a>
+        <a href="#about" class="nav-item">About</a>
+      </nav>
+    </aside>
+    <main class="settings-content">
+      <section id="general" class="settings-section active">
+        <h2>General Settings</h2>
+        <div class="setting-card">
+          <div class="setting-info">
+            <h3>Default Startup View</h3>
+            <p>Choose which tab opens first when you click the extension icon.</p>
+          </div>
+          <div class="setting-control">
+            <select id="default-view">
+              <option value="vault">Prompt Vault</option>
+              <option value="templates">Templates</option>
+              <option value="enhance">Enhance</option>
+              <option value="analytics">Analytics</option>
+            </select>
+          </div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-info">
+            <h3>Enable Floating Toolbar</h3>
+            <p>Show the quick-access floating toolbar on AI platform websites.</p>
+          </div>
+          <div class="setting-control">
+            <label class="toggle-switch">
+              <input type="checkbox" id="floating-toolbar-toggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section id="appearance" class="settings-section">
+        <h2>Appearance</h2>
+        <div class="setting-card">
+          <div class="setting-info">
+            <h3>Theme</h3>
+            <p>Choose your preferred color theme.</p>
+          </div>
+          <div class="setting-control">
+            <select id="theme-select">
+              <option value="dark">Dark Mode (Default)</option>
+              <option value="light">Light Mode</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section id="platforms" class="settings-section">
+        <h2>AI Platforms Integration</h2>
+        <p class="section-desc">Enable or disable PromptFlow injection on specific platforms.</p>
+        
+        <div class="setting-card">
+          <div class="setting-info"><h3>ChatGPT (chat.openai.com)</h3></div>
+          <div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="plat-chatgpt" checked><span class="slider"></span></label></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-info"><h3>Claude (claude.ai)</h3></div>
+          <div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="plat-claude" checked><span class="slider"></span></label></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-info"><h3>Google Gemini (gemini.google.com)</h3></div>
+          <div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="plat-gemini" checked><span class="slider"></span></label></div>
+        </div>
+      </section>
+
+      <section id="data" class="settings-section">
+        <h2>Data & Storage</h2>
+        <div class="setting-card">
+          <div class="setting-info">
+            <h3>Export Prompts</h3>
+            <p>Download a backup of all your saved prompts.</p>
+          </div>
+          <div class="setting-control">
+            <button class="primary-btn" id="export-btn">Export Data (JSON)</button>
+          </div>
+        </div>
+        <div class="setting-card danger-zone">
+          <div class="setting-info">
+            <h3>Clear All Data</h3>
+            <p>Permanently delete all saved prompts, templates, and settings. This cannot be undone.</p>
+          </div>
+          <div class="setting-control">
+            <button class="danger-btn" id="clear-data-btn">Clear All Data</button>
+          </div>
+        </div>
+      </section>
+      
+      <section id="about" class="settings-section">
+        <h2>About PromptFlow Pro</h2>
+        <div class="about-card">
+          <p>Version 1.0.0</p>
+          <p>Built with ❤️ for AI Power Users.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="toast">Settings Saved!</div>
+  <script src="options.js"></script>
+</body>
+</html>

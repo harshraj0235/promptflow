@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptFlow Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-icon">⚡</span>
+      <h1>PromptFlow <span class="pro">Pro</span></h1>
+    </div>
+    <div class="header-actions">
+      <button id="theme-toggle" class="icon-btn" title="Toggle Theme">🌙</button>
+      <button id="settings-btn" class="icon-btn" title="Settings">⚙️</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-target="vault">Vault</button>
+    <button class="tab" data-target="templates">Templates</button>
+    <button class="tab" data-target="enhance">Enhance</button>
+    <button class="tab" data-target="analytics">Analytics</button>
+  </nav>
+
+  <main>
+    <!-- Vault Tab -->
+    <section id="vault" class="tab-content active">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search prompts (Ctrl+F)...">
+      </div>
+      <div class="filters">
+        <button class="filter-chip active">All</button>
+        <button class="filter-chip">Favorites</button>
+        <button class="filter-chip">Recent</button>
+      </div>
+      <div class="vault-container">
+        <div class="sidebar">
+          <ul class="folder-tree">
+            <li class="folder active">📁 All Prompts</li>
+            <li class="folder">📁 Coding</li>
+            <li class="folder">📁 Marketing</li>
+            <li class="folder">📁 Writing</li>
+          </ul>
+        </div>
+        <div class="prompt-grid" id="prompt-list">
+          <!-- Prompts will be injected here -->
+          <div class="empty-state">
+            <div class="empty-icon">🗂️</div>
+            <p>Your vault is empty</p>
+            <button class="primary-btn" id="create-first-btn">Create Prompt</button>
+          </div>
+        </div>
+      </div>
+      <button class="floating-btn" id="new-prompt-btn" title="New Prompt">+</button>
+    </section>
+
+    <!-- Templates Tab -->
+    <section id="templates" class="tab-content">
+      <div class="filters">
+        <button class="filter-chip active">All</button>
+        <button class="filter-chip">Coding</button>
+        <button class="filter-chip">Writing</button>
+      </div>
+      <div class="template-grid" id="template-list">
+        <!-- Templates injected here -->
+      </div>
+    </section>
+
+    <!-- Enhance Tab -->
+    <section id="enhance" class="tab-content">
+      <textarea id="enhance-input" placeholder="Paste your rough prompt here to enhance it..."></textarea>
+      <div class="enhance-modes">
+        <label class="mode-card">
+          <input type="radio" name="enhance-mode" value="clarify" checked>
+          <span class="mode-icon">📝</span>
+          <div class="mode-details">
+            <span class="mode-title">Clarify</span>
+            <span class="mode-desc">Improve clarity & specificity</span>
+          </div>
+        </label>
+        <label class="mode-card">
+          <input type="radio" name="enhance-mode" value="structured">
+          <span class="mode-icon">🎯</span>
+          <div class="mode-details">
+            <span class="mode-title">Structured</span>
+            <span class="mode-desc">Add role, context & format</span>
+          </div>
+        </label>
+        <label class="mode-card">
+          <input type="radio" name="enhance-mode" value="chain-of-thought">
+          <span class="mode-icon">🔬</span>
+          <div class="mode-details">
+            <span class="mode-title">Chain of Thought</span>
+            <span class="mode-desc">Step-by-step reasoning</span>
+          </div>
+        </label>
+        <label class="mode-card">
+          <input type="radio" name="enhance-mode" value="professional">
+          <span class="mode-icon">💼</span>
+          <div class="mode-details">
+            <span class="mode-title">Professional</span>
+            <span class="mode-desc">Formal expert framing</span>
+          </div>
+        </label>
+      </div>
+      <button id="enhance-btn" class="primary-btn full-width">✨ Enhance Prompt</button>
+      
+      <div id="enhance-result" class="hidden">
+        <div class="score-meter">
+          <span>Quality Score</span>
+          <div class="meter-bar"><div class="meter-fill" style="width: 85%"></div></div>
+          <span class="score-value">85/100</span>
+        </div>
+        <textarea id="enhance-output" readonly></textarea>
+        <div class="action-row">
+          <button id="copy-enhanced" class="secondary-btn">📋 Copy</button>
+          <button id="save-enhanced" class="primary-btn">💾 Save to Vault</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analytics Tab -->
+    <section id="analytics" class="tab-content">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <span class="stat-value">0</span>
+          <span class="stat-label">Total Prompts</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">0</span>
+          <span class="stat-label">Used Today</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">0m</span>
+          <span class="stat-label">Time Saved</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">0</span>
+          <span class="stat-label">Enhancements</span>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <h3>Daily Usage</h3>
+        <div class="bar-chart" id="usage-chart">
+          <!-- Bars generated via JS/CSS -->
+        </div>
+      </div>
+      
+      <div class="top-prompts">
+        <h3>Most Used</h3>
+        <ul id="top-prompts-list">
+          <li class="empty-list">Not enough data yet</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <button id="open-panel-btn" class="text-btn">↗ Open Full Panel</button>
+    <span class="version">v1.0.0</span>
+  </footer>
+
+  <!-- New/Edit Prompt Modal -->
+  <div id="prompt-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">New Prompt</h2>
+        <button class="close-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="prompt-title" placeholder="Prompt Title (e.g., React Component Generator)">
+        <div class="editor-container">
+          <textarea id="prompt-content" placeholder="Enter your prompt here... Use {{variable}} for placeholders."></textarea>
+        </div>
+        <div class="detected-variables hidden" id="detected-variables">
+          <span>Variables detected: </span>
+          <div class="var-list"></div>
+        </div>
+        <div class="form-row">
+          <input type="text" id="prompt-tags" placeholder="Add tags (comma separated)">
+          <select id="prompt-folder">
+            <option value="root">All Prompts</option>
+            <option value="coding">Coding</option>
+            <option value="marketing">Marketing</option>
+            <option value="writing">Writing</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn cancel-modal">Cancel</button>
+        <button class="primary-btn" id="save-prompt-btn">Save Prompt</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

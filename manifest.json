@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "PromptFlow Pro",
+  "version": "1.0.0",
+  "description": "The Ultimate AI Prompt Manager \u2014 Save, organize, enhance & reuse prompts across ChatGPT, Claude, Gemini, Perplexity, Copilot & more",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "sidePanel",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "*://chat.openai.com/*",
+    "*://chatgpt.com/*",
+    "*://claude.ai/*",
+    "*://gemini.google.com/*",
+    "*://*.perplexity.ai/*",
+    "*://copilot.microsoft.com/*",
+    "*://x.com/i/grok*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
+  "options_page": "options/options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://chat.openai.com/*",
+        "*://chatgpt.com/*",
+        "*://claude.ai/*",
+        "*://gemini.google.com/*",
+        "*://*.perplexity.ai/*",
+        "*://copilot.microsoft.com/*",
+        "*://x.com/i/grok*"
+      ],
+      "js": [
+        "content-scripts/floating-toolbar.js",
+        "content-scripts/universal-injector.js"
+      ],
+      "css": [
+        "content-scripts/floating-toolbar.css"
+      ]
+    }
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
+      }
+    }
+  }
+}
