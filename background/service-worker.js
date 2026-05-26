@@ -119,22 +119,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true;
     }
 
-    const masterPrompt = `You are an elite AI Meta-Prompt Engineer.
-You MUST process the user's input strictly through this internal pipeline before outputting:
-1. Prompt Analyzer (Deconstruct the core request)
-2. Intent Detection (Determine the true goal and missing context)
-3. Prompt Expansion Engine (Inject expert personas, edge-cases, and structural requirements)
-4. AI Optimization Layer (Format the prompt for maximum LLM comprehension)
-
-CRITICAL OUTPUT RULES:
-Return ONLY the final "Enhanced Prompt" text.
-DO NOT output the pipeline steps. DO NOT include any headers like "[Enhanced Prompt]". DO NOT use any Markdown formatting like bold (**). Start directly with the prompt text so the user can send it instantly.`;
+    const masterPrompt = `Rewrite the user's prompt into a highly detailed, optimized, professional prompt. Add an expert persona, remove ambiguity, and add structure.
+CRITICAL RULES: Return ONLY the raw enhanced prompt text. NO markdown formatting. NO headers. NO conversational filler.`;
 
     const seed = Math.floor(Math.random() * 1000000);
     
-    // Use default openai model which maps to the fast production-ready endpoint
+    // Use mistral model for guaranteed sub-3-second generation speeds
     const payload = {
-      model: "openai", 
+      model: "mistral", 
       messages: [
         { role: "system", content: masterPrompt },
         { role: "user", content: request.text }
