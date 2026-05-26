@@ -40,7 +40,7 @@ function createInlineUI() {
   const inlineIcons = document.createElement('div');
   inlineIcons.className = 'pf-inline-icons';
   inlineIcons.innerHTML = `
-    <div class="pf-icon-btn pf-logo-btn" title="Craft with PromptFlow" id="pf-icon-p">P</div>
+    <div class="pf-icon-btn pf-logo-btn" title="Enhance Prompt (Ctrl+M)" id="pf-icon-p">P</div>
     <div class="pf-icon-btn" title="Export Chat" id="pf-icon-export">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
     </div>
@@ -115,13 +115,13 @@ function updateUIPosition() {
   
   // Position top toolbar ABOVE the input
   window.pfTopToolbar.style.position = 'fixed';
-  window.pfTopToolbar.style.top = (rect.top - 70) + 'px';
+  window.pfTopToolbar.style.top = (rect.top - 60) + 'px';
   window.pfTopToolbar.style.left = rect.left + 'px';
   
-  // Position inline icons INSIDE the input on the right
+  // Position inline icons INSIDE the input on the right, perfectly aligned next to the submit button
   window.pfInlineIcons.style.position = 'fixed';
-  window.pfInlineIcons.style.top = (rect.bottom - 40) + 'px';
-  window.pfInlineIcons.style.left = (rect.right - 140) + 'px'; // Adjust based on submit button
+  window.pfInlineIcons.style.top = (rect.bottom - 42) + 'px'; // Aligned with typical input height
+  window.pfInlineIcons.style.left = (rect.right - 120) + 'px'; // Tucked exactly to the left of ChatGPT's submit button
 }
 
 const observer = new MutationObserver((mutations) => {
