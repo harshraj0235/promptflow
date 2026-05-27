@@ -7,11 +7,18 @@
     "storage",
     "activeTab",
     "sidePanel",
-    "contextMenus"
+    "contextMenus",
+    "scripting"
   ],
   "host_permissions": [
     "https://text.pollinations.ai/*",
-    "<all_urls>"
+    "*://chat.openai.com/*",
+    "*://chatgpt.com/*",
+    "*://claude.ai/*",
+    "*://gemini.google.com/*",
+    "*://*.perplexity.ai/*",
+    "*://copilot.microsoft.com/*",
+    "*://x.com/i/grok*"
   ],
   "background": {
     "service_worker": "background/service-worker.js"
