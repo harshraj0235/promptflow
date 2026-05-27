@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PromptFlow Pro",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Intent \u2192 Structured AI Execution Engine. Automatically transform raw thoughts into elite, perfectly structured AI instructions.",
   "permissions": [
     "storage",
