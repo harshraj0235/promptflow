@@ -158,6 +158,11 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.sendMessage({ action: 'ai_enhance', text: text, tone: tone }, (response) => {
       craftBtn.innerHTML = '✨ Enhance';
       craftBtn.disabled = false;
+      if (response && response.error === 'QUEUE_FULL') {
+         craftOutput.value = "⚠️ Pollinations AI is currently experiencing very high traffic. Please wait 10 seconds and try again.";
+         craftResultGroup.classList.remove('hidden');
+         return;
+      }
       if (chrome.runtime.lastError || !response || !response.success) {
          craftOutput.value = "Error: Failed to reach AI enhancer.";
          craftResultGroup.classList.remove('hidden');

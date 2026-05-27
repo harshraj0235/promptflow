@@ -117,8 +117,13 @@ function triggerEnhance(tone = 'auto') {
         return;
       }
 
+      if (response && response.error === 'QUEUE_FULL') {
+        showError('Pollinations AI traffic is too high. Please wait 10 seconds.');
+        return;
+      }
+
       if (!response.success) {
-        showError('Enhancement failed. Retrying...');
+        showError('Enhancement failed. Please try again later.');
         return;
       }
 

@@ -201,10 +201,14 @@ async function enhancePrompt(text, tone, settings) {
     } catch (e) {
       errors.push(`POST#${attempt + 1}: ${e.message}`);
       console.warn(`PromptFlow: POST attempt ${attempt + 1} failed —`, e.message);
-      if (e.message.includes('429')) {
-        await delay(1500);
+      
+      // If Queue is full, use exponential backoff
+      if (e.message.includes('429') || e.message.includes('Queue full')) {
+        const backoff = (attempt + 1) * 3500; // 3.5s, then 7s
+        console.log(`PromptFlow: Rate limited. Waiting ${backoff}ms...`);
+        await delay(backoff);
       } else {
-        await delay(500);
+        await delay(1000);
       }
     }
   }
@@ -212,6 +216,7 @@ async function enhancePrompt(text, tone, settings) {
   // Strategy 2: GET endpoint (fallback)
   try {
     console.log('PromptFlow: Falling back to GET endpoint...');
+    await delay(2000); // Wait slightly before hitting GET to let queues clear
     const result = await callPollinationsGET(text, systemPrompt);
     const elapsed = Date.now() - startTime;
     console.log(`PromptFlow: Success via GET fallback in ${elapsed}ms`);
@@ -221,7 +226,7 @@ async function enhancePrompt(text, tone, settings) {
     console.warn('PromptFlow: GET fallback also failed —', e.message);
   }
 
-  throw new Error(`All attempts failed. Details:\n${errors.join('\n')}`);
+  return { error: 'QUEUE_FULL', rawError: errors.join(' | ') };
 }
 
 // ═══════════════════════════════════════════════════════════════
