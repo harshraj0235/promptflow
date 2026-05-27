@@ -45,104 +45,40 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// THE BRAIN — Elite Prompt Enhancement System Prompt
-// This is the MOST important part of the entire extension.
+// CRAFTED+ ENGINE — Single-Pass, Maximum Speed
+// Merged Intent Detection + Engineering + Scoring into ONE call
 // ═══════════════════════════════════════════════════════════════
 
-const MASTER_SYSTEM_PROMPT = `You are an elite AI prompt engineer and the core engine of PromptFlow Pro.
+const CRAFTED_SYSTEM = `You are an elite Prompt Architect. Transform the user's raw input into a precise, high-performance AI prompt.
 
-Your job is to transform weak, vague, or incomplete prompts into highly optimized, structured prompts that maximize AI output quality.
-
-PROCESS (follow every time):
-
-STEP 1 — INTENT DETECTION
-Analyze what the user REALLY wants. Classify the prompt type:
-- Image generation, Video generation, Coding, Marketing, SEO, Blog writing, UI/UX design, Resume, Storytelling, YouTube scripts, Automation, Business ideas, Email, Research, Data analysis, Social media, Music, or General
-
-STEP 2 — MISSING DETAIL DETECTION
-Identify what's missing and auto-fill with smart defaults:
-- Who is the audience?
-- What style/tone?
-- What format/structure?
-- What platform is this for?
-- What constraints exist?
-- What's the end goal?
-
-STEP 3 — PROMPT EXPANSION
-Use this enhancement formula:
-ROLE + TASK + CONTEXT + STYLE + FORMAT + CONSTRAINTS + OUTPUT GOAL
-
-For IMAGE/VIDEO prompts, use:
-SUBJECT + ACTION + ENVIRONMENT + LIGHTING + CAMERA + STYLE + DETAILS + QUALITY + MOOD + OUTPUT FORMAT
-
-STEP 4 — STRUCTURE & CLARITY
-- Add clear sections with labels
-- Use bullet points for lists
-- Add specific details, numbers, dimensions
-- Remove ambiguity
-- Add expert-level context
-
-CRITICAL OUTPUT RULES:
-- Return ONLY the enhanced prompt text
-- NO markdown formatting (no bold, no italic, no asterisks, no headers with #)
-- NO conversational text like "Here's your enhanced prompt" or "Sure!"
-- NO quotation marks wrapping the output
-- NO explanations of what you changed
-- Just the raw, ready-to-paste enhanced prompt
-- Keep the user's original meaning and intent intact
-- Make it 3x to 10x more detailed than the input
-- Make it immediately usable — paste-ready`;
-
-
-
-// ═══════════════════════════════════════════════════════════════
-// FREE PROVIDER STACK — Auto-failover, zero cost, scales to millions
-// Uses text.pollinations.ai POST endpoint (free, no auth needed)
-// ═══════════════════════════════════════════════════════════════
-
-const FREE_PROVIDERS = [
-  { name: 'Pollinations AI (Fast)', model: 'openai-fast',  timeout: 30000 },
-  { name: 'Pollinations AI (Base)', model: 'openai',       timeout: 30000 }
-];
-
-const PASS1_SYSTEM = `You are an elite Prompt Architect.
-Your task is to transform vague user input into a precise, optimized, high-performance AI prompt.
-
-Your objectives:
-- Infer user intent and target audience
-- Add missing clarity
-- Structure instructions logically
-- Define role/context
-- Specify output format
-- Add useful constraints
-- Improve reasoning instructions
-- Optimize for the selected AI model
-- Preserve original user intent exactly
-
-Return ONLY the enhanced prompt. Do not include conversational filler like "Here is your prompt". Return it completely paste-ready.`;
-
-const PASS2_SYSTEM = `You are an elite Prompt Scorer and Refiner.
-Your task is to evaluate the provided engineered prompt, fix any remaining ambiguities, and append a Prompt Quality Score.
+Process:
+1. Detect intent (coding, marketing, creative, image, business, research, email, social media, etc.)
+2. Infer missing context: audience, tone, format, platform, constraints
+3. Structure using: ROLE + TASK + CONTEXT + FORMAT + CONSTRAINTS + OUTPUT GOAL
+4. For image/video prompts use: SUBJECT + ACTION + ENVIRONMENT + LIGHTING + STYLE + MOOD
+5. Score the final prompt quality out of 100
 
 Rules:
-1. Polish the text for maximum clarity and structural flow.
-2. DO NOT change the core meaning.
-3. At the very bottom of the prompt, append exactly this format: "Prompt Quality Score: [XX]/100" (where XX is your rigorous evaluation of the prompt's clarity, context, and constraints).
-4. Return ONLY the final polished prompt with the score attached. No conversational filler.`;
+- Return ONLY the enhanced prompt, completely paste-ready
+- NO markdown (no bold, no #headers, no asterisks)
+- NO filler like "Here is your prompt"
+- NO quotes wrapping the output
+- Preserve original intent exactly
+- Make it 3-10x more detailed
+- End with: Prompt Quality Score: [XX]/100`;
 
-function getPass1SystemPrompt(tone, settings = {}) {
-  let prompt = PASS1_SYSTEM;
+function buildSystemPrompt(tone, settings = {}) {
+  let prompt = CRAFTED_SYSTEM;
 
   if (settings.persAudience || settings.persStyle || settings.persExamples) {
-    prompt += `\n\n--- USER PERSONALIZATION PROFILE ---`;
-    if (settings.persAudience) prompt += `\nDEFAULT TARGET AUDIENCE: ${settings.persAudience}`;
-    if (settings.persStyle) prompt += `\nCUSTOM WRITING STYLE & PERSONA: ${settings.persStyle}\n(CRITICAL: You MUST adopt this persona and writing style strictly.)`;
-    if (settings.persExamples) prompt += `\nFEW-SHOT EXAMPLES OF "GOOD" OUTPUTS:\n${settings.persExamples}\n(CRITICAL: Anchor your enhancement tightly to these examples.)`;
-    prompt += `\n-----------------------------------`;
+    prompt += `\n\n--- USER PROFILE ---`;
+    if (settings.persAudience) prompt += `\nAUDIENCE: ${settings.persAudience}`;
+    if (settings.persStyle) prompt += `\nSTYLE: ${settings.persStyle}`;
+    if (settings.persExamples) prompt += `\nEXAMPLES:\n${settings.persExamples}`;
   }
 
   if (tone && tone !== 'auto') {
-    prompt += `\n\nCRITICAL INSTRUCTION: The user has explicitly requested to optimize this prompt for the following goal/tone: [${tone.toUpperCase()}]. Ensure the Tone and Context reflect this choice perfectly.`;
+    prompt += `\n\nOPTIMIZE FOR TONE: ${tone.toUpperCase()}`;
   }
   
   return prompt;
@@ -151,37 +87,54 @@ function getPass1SystemPrompt(tone, settings = {}) {
 // Sleep helper
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function callPollinations(text, systemPrompt, model) {
-  try {
-    const res = await fetch('https://text.pollinations.ai/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: text }
-        ],
-        max_tokens: 1500,
-        temperature: 0.7
-      })
-    });
+// ═══════════════════════════════════════════════════════════════
+// FAST POST — Primary method via OpenAI-compatible endpoint
+// ═══════════════════════════════════════════════════════════════
+async function callPollinationsPOST(text, systemPrompt) {
+  const res = await fetch('https://text.pollinations.ai/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'openai-fast',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: text }
+      ],
+      max_tokens: 1000,
+      temperature: 0.6
+    })
+  });
 
-    if (!res.ok) {
-      const errBody = await res.text().catch(() => '');
-      throw new Error(`HTTP ${res.status}: ${errBody.substring(0, 150)}`);
-    }
-
-    const data = await res.json();
-    if (!data.choices?.[0]?.message) throw new Error('Invalid response structure');
-    return data.choices[0].message.content.trim();
-  } catch (e) {
-    throw e;
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '');
+    throw new Error(`POST ${res.status}: ${errBody.substring(0, 120)}`);
   }
+
+  const data = await res.json();
+  if (!data.choices?.[0]?.message) throw new Error('Invalid POST response');
+  return data.choices[0].message.content.trim();
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CLEANUP — Strip any markdown artifacts from AI output
+// FAST GET — Fallback method via simple GET endpoint
+// ═══════════════════════════════════════════════════════════════
+async function callPollinationsGET(text, systemPrompt) {
+  const fullPrompt = systemPrompt + '\n\nUser input to enhance:\n' + text;
+  const encoded = encodeURIComponent(fullPrompt);
+  const url = `https://text.pollinations.ai/${encoded}?model=openai-fast&noCache=true`;
+  
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`GET ${res.status}`);
+  }
+  
+  const result = await res.text();
+  if (!result || result.length < 10) throw new Error('Empty GET response');
+  return result.trim();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLEANUP — Strip markdown/filler from AI output
 // ═══════════════════════════════════════════════════════════════
 
 function cleanText(raw) {
@@ -199,44 +152,46 @@ function cleanText(raw) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MAIN ENHANCE — Pollinations Multi-Pass Architecture
+// MAIN ENHANCE — Single Pass + Auto-Fallback (POST → GET)
 // ═══════════════════════════════════════════════════════════════
 
 async function enhancePrompt(text, tone, settings) {
   const startTime = Date.now();
+  const systemPrompt = buildSystemPrompt(tone, settings);
   const errors = [];
-  
-  for (const prov of FREE_PROVIDERS) {
-    let retries = 2; // Allow up to 2 retries per model if queue is full
-    
-    while (retries >= 0) {
-      try {
-        console.log(`PromptFlow: Pass 1 (Engineering) on ${prov.name}...`);
-        const pass1Result = await callPollinations(text, getPass1SystemPrompt(tone, settings), prov.model);
-        
-        console.log(`PromptFlow: Pass 2 (Scoring & Refinement) on ${prov.name}...`);
-        const pass2Result = await callPollinations(pass1Result, PASS2_SYSTEM, prov.model);
-        
-        const elapsed = Date.now() - startTime;
-        console.log(`PromptFlow: Multi-Pass on ${prov.name} finished in ${elapsed}ms`);
-        return { text: cleanText(pass2Result), provider: prov.name, time: elapsed };
-      } catch (e) {
-        if ((e.message === 'RATE_LIMIT' || e.message.includes('429')) && retries > 0) {
-            console.log(`Queue full for ${prov.name}, waiting 2 seconds...`);
-            await delay(2000);
-            retries--;
-            continue; // Retry same model
-        }
-        
-        // If it wasn't a rate limit, or we're out of retries, log error and break to next model
-        errors.push(`${prov.name}: ${e.message}`);
-        console.warn(`PromptFlow: ${prov.name} failed —`, e.message);
-        break; 
+
+  // Strategy 1: POST endpoint (primary, most reliable)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      console.log(`PromptFlow: POST attempt ${attempt + 1}...`);
+      const result = await callPollinationsPOST(text, systemPrompt);
+      const elapsed = Date.now() - startTime;
+      console.log(`PromptFlow: Success via POST in ${elapsed}ms`);
+      return { text: cleanText(result), provider: 'Pollinations AI', time: elapsed };
+    } catch (e) {
+      errors.push(`POST#${attempt + 1}: ${e.message}`);
+      console.warn(`PromptFlow: POST attempt ${attempt + 1} failed —`, e.message);
+      if (e.message.includes('429')) {
+        await delay(1500);
+      } else {
+        await delay(500);
       }
     }
   }
 
-  throw new Error(`All providers failed. Details:\n${errors.join('\n')}`);
+  // Strategy 2: GET endpoint (fallback)
+  try {
+    console.log('PromptFlow: Falling back to GET endpoint...');
+    const result = await callPollinationsGET(text, systemPrompt);
+    const elapsed = Date.now() - startTime;
+    console.log(`PromptFlow: Success via GET fallback in ${elapsed}ms`);
+    return { text: cleanText(result), provider: 'Pollinations AI (GET)', time: elapsed };
+  } catch (e) {
+    errors.push(`GET: ${e.message}`);
+    console.warn('PromptFlow: GET fallback also failed —', e.message);
+  }
+
+  throw new Error(`All attempts failed. Details:\n${errors.join('\n')}`);
 }
 
 // ═══════════════════════════════════════════════════════════════

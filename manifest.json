@@ -11,8 +11,6 @@
   ],
   "host_permissions": [
     "https://text.pollinations.ai/*",
-    "https://api.groq.com/*",
-    "https://api.openai.com/*",
     "*://chat.openai.com/*",
     "*://chatgpt.com/*",
     "*://claude.ai/*",
