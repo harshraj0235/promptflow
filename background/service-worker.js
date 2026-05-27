@@ -182,51 +182,49 @@ function cleanText(raw) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MAIN ENHANCE — Single Pass + Auto-Fallback (POST → GET)
+// MAIN ENHANCE — Lightning Speed (Promise.any Racing)
 // ═══════════════════════════════════════════════════════════════
 
 async function enhancePrompt(text, tone, settings) {
   const startTime = Date.now();
   const systemPrompt = buildSystemPrompt(tone, settings);
-  const errors = [];
+  console.log('PromptFlow: Firing POST and GET simultaneously for Lightning Speed...');
 
-  // Strategy 1: POST endpoint (primary, most reliable)
-  for (let attempt = 0; attempt < 3; attempt++) {
+  // Wrap calls with their provider info to distinguish them
+  const postCall = async () => {
     try {
-      console.log(`PromptFlow: POST attempt ${attempt + 1}...`);
-      const result = await callPollinationsPOST(text, systemPrompt);
-      const elapsed = Date.now() - startTime;
-      console.log(`PromptFlow: Success via POST in ${elapsed}ms`);
-      return { text: cleanText(result), provider: 'Pollinations AI', time: elapsed };
+      const res = await callPollinationsPOST(text, systemPrompt);
+      return { text: cleanText(res), provider: 'Pollinations AI (POST)', time: Date.now() - startTime };
     } catch (e) {
-      errors.push(`POST#${attempt + 1}: ${e.message}`);
-      console.warn(`PromptFlow: POST attempt ${attempt + 1} failed —`, e.message);
-      
-      // If Queue is full, use exponential backoff
-      if (e.message.includes('429') || e.message.includes('Queue full')) {
-        const backoff = (attempt + 1) * 3500; // 3.5s, then 7s
-        console.log(`PromptFlow: Rate limited. Waiting ${backoff}ms...`);
-        await delay(backoff);
-      } else {
-        await delay(1000);
-      }
+      throw new Error(`POST failed: ${e.message}`);
+    }
+  };
+
+  const getCall = async () => {
+    try {
+      const res = await callPollinationsGET(text, systemPrompt);
+      return { text: cleanText(res), provider: 'Pollinations AI (GET)', time: Date.now() - startTime };
+    } catch (e) {
+      throw new Error(`GET failed: ${e.message}`);
+    }
+  };
+
+  try {
+    // Race them! Whichever resolves first wins.
+    const fastestResult = await Promise.any([postCall(), getCall()]);
+    console.log(`PromptFlow: Won by ${fastestResult.provider} in ${fastestResult.time}ms`);
+    return fastestResult;
+  } catch (aggregateError) {
+    console.warn('PromptFlow: Both POST and GET failed. Entering Fallback Backoff state.');
+    try {
+      await delay(5000); // Backoff for 5s to clear queue limit
+      console.log('PromptFlow: Firing final fallback GET request...');
+      const res = await callPollinationsGET(text, systemPrompt);
+      return { text: cleanText(res), provider: 'Pollinations AI (Fallback)', time: Date.now() - startTime };
+    } catch (finalErr) {
+      return { error: 'QUEUE_FULL', rawError: finalErr.message };
     }
   }
-
-  // Strategy 2: GET endpoint (fallback)
-  try {
-    console.log('PromptFlow: Falling back to GET endpoint...');
-    await delay(2000); // Wait slightly before hitting GET to let queues clear
-    const result = await callPollinationsGET(text, systemPrompt);
-    const elapsed = Date.now() - startTime;
-    console.log(`PromptFlow: Success via GET fallback in ${elapsed}ms`);
-    return { text: cleanText(result), provider: 'Pollinations AI (GET)', time: elapsed };
-  } catch (e) {
-    errors.push(`GET: ${e.message}`);
-    console.warn('PromptFlow: GET fallback also failed —', e.message);
-  }
-
-  return { error: 'QUEUE_FULL', rawError: errors.join(' | ') };
 }
 
 // ═══════════════════════════════════════════════════════════════

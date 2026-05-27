@@ -11,13 +11,7 @@
   ],
   "host_permissions": [
     "https://text.pollinations.ai/*",
-    "*://chat.openai.com/*",
-    "*://chatgpt.com/*",
-    "*://claude.ai/*",
-    "*://gemini.google.com/*",
-    "*://*.perplexity.ai/*",
-    "*://copilot.microsoft.com/*",
-    "*://x.com/i/grok*"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background/service-worker.js"
@@ -43,13 +37,7 @@
   "content_scripts": [
     {
       "matches": [
-        "*://chat.openai.com/*",
-        "*://chatgpt.com/*",
-        "*://claude.ai/*",
-        "*://gemini.google.com/*",
-        "*://*.perplexity.ai/*",
-        "*://copilot.microsoft.com/*",
-        "*://x.com/i/grok*"
+        "<all_urls>"
       ],
       "js": [
         "content-scripts/universal-injector.js"
