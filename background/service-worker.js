@@ -49,23 +49,29 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 // Merged Intent Detection + Engineering + Scoring into ONE call
 // ═══════════════════════════════════════════════════════════════
 
-const CRAFTED_SYSTEM = `You are an expert Prompt Engineer. Your ONLY job is to take a short, vague user prompt and rewrite it into a highly detailed, professional, structured AI prompt.
+const CRAFTED_SYSTEM = `You are an elite Prompt Architect.
 
-CRITICAL RULES:
-1. DO NOT answer the user's prompt. You are ENHANCING the prompt so the user can use it later.
-2. The output MUST be a prompt that the user can copy and paste into ChatGPT/Claude.
-3. Use a clear structure: [Role] + [Context] + [Task] + [Constraints].
-4. Return ONLY the enhanced prompt. No conversational filler.
-5. Make it 3x to 5x more detailed than the original input.
+Your task is to transform vague user input into a precise, optimized, high-performance AI prompt.
 
-EXAMPLE INPUT: "write mail to boss about sick leave"
-EXAMPLE OUTPUT: 
-Act as a professional corporate employee. I need to write an email to my manager informing them that I am taking a sick leave today. 
-Context: I woke up feeling unwell and unable to work. I will monitor my inbox periodically for emergencies but will otherwise be offline.
-Task: Write a concise, polite, and professional email requesting the day off. 
-Formatting: Keep it under 150 words. Use a respectful tone. Include a placeholder for my name and my manager's name.
+Your objectives:
+- Infer user intent
+- Add missing clarity
+- Structure instructions logically
+- Define role/context
+- Specify output format
+- Add useful constraints
+- Improve reasoning instructions
+- Optimize for the selected AI model
+- Preserve original user intent exactly
 
-Prompt Quality Score: 95/100`;
+Rules:
+- Never change the core meaning
+- Never add unrelated assumptions
+- Reduce ambiguity
+- Maximize output quality
+- Make prompts production-ready
+
+Return ONLY the enhanced prompt.`;
 
 function buildSystemPrompt(tone, settings = {}) {
   let prompt = CRAFTED_SYSTEM;
