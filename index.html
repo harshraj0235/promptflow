@@ -275,10 +275,11 @@ Analytical, professional, and directly actionable.`;
       demoOutput.innerHTML = '<span class="demo-placeholder" style="color:#8b5cf6;">Translating intent...</span>';
       
       try {
-        const response = await fetch('https://text.pollinations.ai/openai-fast', {
+        const response = await fetch('https://text.pollinations.ai/openai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            model: 'openai-fast',
             messages: [
               { role: 'system', content: SYSTEM_PROMPT },
               { role: 'user', content: text }
@@ -293,7 +294,9 @@ Analytical, professional, and directly actionable.`;
           throw new Error("API Error: " + response.status);
         }
 
-        const data = await response.text();
+        const json = await response.json();
+        const data = json.choices[0].message.content;
+        
         // Remove markdown wrappers if any
         let clean = data.trim();
         if (clean.startsWith('```markdown')) clean = clean.substring(11);
