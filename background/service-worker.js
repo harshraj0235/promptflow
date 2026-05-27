@@ -288,8 +288,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.storage.sync.get(['persAudience', 'persStyle', 'persExamples'], (settings) => {
       enhancePrompt(request.text, tone, settings || {})
         .then(result => {
-          enhanceCache.set(cacheKey, result.text);
-          sendResponse({ success: true, text: result.text, provider: result.provider, time: result.time });
+          if (result.error) {
+            sendResponse({ success: false, error: result.error, rawError: result.rawError });
+          } else {
+            enhanceCache.set(cacheKey, result.text);
+            sendResponse({ success: true, text: result.text, provider: result.provider, time: result.time });
+          }
         })
         .catch(err => {
           console.error('PromptFlow: Enhancement failed:', err);
