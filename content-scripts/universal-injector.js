@@ -1,3 +1,6 @@
+(function() {
+  if (window.pfCleanupOld) window.pfCleanupOld();
+
 // ═══════════════════════════════════════════════════════════════
 // PromptFlow Pro v3.0 — Universal Content Script
 // Injects floating toolbar + command palette on all AI platforms
@@ -5,7 +8,10 @@
 
 console.log("PromptFlow Pro v3.0: Injector active");
 
-let activeInput = null;
+const pfInstanceId = Date.now();
+  window.pfActiveInstance = pfInstanceId;
+
+  let activeInput = null;
 let btnContainer = null;
 let inlineBtn = null;
 
@@ -189,7 +195,7 @@ function showError(msg) {
 
 function handleExtensionError(err) {
   if (err.message && err.message.includes('Extension context invalidated')) {
-    showToast('PromptFlow updated! Please refresh this page.', 'warn');
+    console.warn('Old extension context dead');
   } else {
     console.error('PromptFlow:', err);
     showError('Something went wrong');
@@ -517,3 +523,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Initialize
 injectCommandPalette();
+
+
+  window.pfCleanupOld = function() {
+    document.getElementById('pf-inline-btn-container')?.remove();
+    document.getElementById('pf-command-palette-overlay')?.remove();
+  };
+})();
+
+
