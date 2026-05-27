@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "PromptFlow Pro",
   "version": "1.0.0",
-  "description": "The Ultimate AI Prompt Manager \u2014 Save, organize, enhance & reuse prompts across ChatGPT, Claude, Gemini, Perplexity, Copilot & more",
+  "description": "Intent \u2192 Structured AI Execution Engine. Automatically transform raw thoughts into elite, perfectly structured AI instructions.",
   "permissions": [
     "storage",
     "activeTab",
