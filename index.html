@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PromptFlow Pro - Intent → Structured AI Execution Engine</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
       --bg-primary: #050505;
@@ -104,6 +105,14 @@
     .demo-btn:hover { background: #1d4ed8; }
     .demo-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
+    .action-btn {
+      background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-color);
+      color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px;
+      font-weight: 600; cursor: pointer; transition: 0.2s;
+    }
+    .action-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.2); }
+    .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
     .output-pane { background: #0a0a0f; border-color: rgba(139, 92, 246, 0.3); }
     .demo-output {
       font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #e2e8f0;
@@ -157,7 +166,13 @@
           <button id="demoBtn" class="demo-btn">✨ Enhance Now</button>
         </div>
         <div class="output-pane">
-          <div class="pane-header">Machine Instruction (Elite)</div>
+          <div class="pane-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Machine Instruction (Elite)</span>
+            <div style="display:flex; gap:8px;">
+              <button id="copyBtn" class="action-btn" title="Copy to Clipboard" disabled>📋 Copy</button>
+              <button id="pdfBtn" class="action-btn" title="Download PDF" disabled>📄 PDF</button>
+            </div>
+          </div>
           <div id="demoOutput" class="demo-output"><span class="demo-placeholder">Awaiting input...</span></div>
         </div>
       </div>
@@ -288,8 +303,12 @@ Analytical, professional, and directly actionable.`;
         clean = clean.trim();
 
         demoOutput.innerHTML = clean.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        document.getElementById('copyBtn').disabled = false;
+        document.getElementById('pdfBtn').disabled = false;
       } catch (err) {
         demoOutput.innerHTML = `<span style="color:#ef4444;">Error: ${err.message}. Please try again.</span>`;
+        document.getElementById('copyBtn').disabled = true;
+        document.getElementById('pdfBtn').disabled = true;
       } finally {
         demoBtn.disabled = false;
         demoBtn.innerHTML = '✨ Enhance Now';
@@ -300,6 +319,35 @@ Analytical, professional, and directly actionable.`;
       const text = demoInput.value.trim();
       if (!text) return;
       enhancePromptLive(text);
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const text = demoOutput.innerText;
+      if (!text || text.includes('Awaiting input')) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.innerHTML = '✅ Copied!';
+        setTimeout(() => btn.innerHTML = '📋 Copy', 2000);
+      });
+    });
+
+    document.getElementById('pdfBtn').addEventListener('click', () => {
+      const text = demoOutput.innerText;
+      if (!text || text.includes('Awaiting input')) return;
+      
+      const opt = {
+        margin:       1,
+        filename:     'Enhanced-Prompt.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      // Create a temporary div with just the text so the PDF is clean
+      const element = document.createElement('div');
+      element.innerHTML = `<h2 style="font-family:sans-serif; color:#333;">PromptFlow Pro - Enhanced Prompt</h2><pre style="font-family:monospace; white-space:pre-wrap; font-size:12px; color:#000;">${text}</pre>`;
+      
+      html2pdf().set(opt).from(element).save();
     });
   </script>
 </body>
