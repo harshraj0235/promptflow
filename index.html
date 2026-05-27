@@ -3,325 +3,304 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PromptFlow Pro - Get Better AI Responses in One Click</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>PromptFlow Pro - Intent → Structured AI Execution Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #0a0a0f;
-      --bg-secondary: #12121a;
-      --bg-tertiary: #1a1a2e;
-      --text-primary: #f8f9fa;
-      --text-secondary: #a0a0b8;
-      --accent-primary: #6C5CE7;
-      --accent-secondary: #a855f7;
-      --border-color: rgba(255, 255, 255, 0.1);
+      --bg-primary: #050505;
+      --bg-secondary: #0d0d12;
+      --bg-tertiary: #16161e;
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --accent-primary: #8b5cf6;
+      --accent-secondary: #c084fc;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --glass-bg: rgba(20, 20, 25, 0.6);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', sans-serif;
       background-color: var(--bg-primary);
       color: var(--text-primary);
       line-height: 1.6;
       overflow-x: hidden;
+      background-image: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
     }
 
     nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 24px 5%;
-      max-width: 1400px;
-      margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 24px 5%; max-width: 1400px; margin: 0 auto;
     }
 
     .logo {
-      font-size: 24px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 12px;
+    }
+    .logo span {
+      background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
-    .logo span {
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .nav-links a {
+      color: var(--text-primary); text-decoration: none; margin-left: 24px; font-weight: 500;
+      transition: color 0.2s;
     }
+    .nav-links a:hover { color: var(--accent-secondary); }
 
     .hero {
-      text-align: center;
-      padding: 100px 5% 60px;
-      max-width: 1000px;
-      margin: 0 auto;
+      text-align: center; padding: 100px 5% 60px; max-width: 1100px; margin: 0 auto;
     }
-
+    .hero-badge {
+      display: inline-block; padding: 6px 16px; background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 100px;
+      color: var(--accent-secondary); font-size: 14px; font-weight: 600; margin-bottom: 24px;
+      letter-spacing: 0.5px;
+    }
     .hero h1 {
-      font-size: 64px;
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 24px;
-      background: linear-gradient(to right, #fff, #a0a0b8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: 68px; font-weight: 800; line-height: 1.1; margin-bottom: 24px; letter-spacing: -1px;
     }
-
+    .hero h1 span {
+      background: linear-gradient(to right, #e879f9, #8b5cf6, #3b82f6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
     .hero p {
-      font-size: 20px;
-      color: var(--text-secondary);
-      margin-bottom: 40px;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
+      font-size: 22px; color: var(--text-secondary); margin-bottom: 40px; max-width: 800px; margin: 0 auto 40px;
     }
 
-    .cta-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      margin-bottom: 24px;
-    }
-
+    .cta-buttons { display: flex; gap: 16px; justify-content: center; margin-bottom: 60px; }
     .primary-btn {
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      color: white;
-      text-decoration: none;
-      padding: 16px 32px;
-      border-radius: 30px;
-      font-weight: 600;
-      font-size: 18px;
-      transition: all 0.3s ease;
-      box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+      background: linear-gradient(135deg, var(--accent-primary), #6d28d9);
+      color: white; text-decoration: none; padding: 18px 36px; border-radius: 12px;
+      font-weight: 600; font-size: 18px; transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); border: 1px solid rgba(255,255,255,0.1);
     }
+    .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5); }
+    
+    .demo-section {
+      background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color);
+      border-radius: 24px; padding: 40px; max-width: 1000px; margin: 0 auto;
+      text-align: left; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+    .demo-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    
+    .demo-container { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+    @media (max-width: 768px) { .demo-container { grid-template-columns: 1fr; } }
+    
+    .input-pane, .output-pane {
+      background: var(--bg-primary); border: 1px solid var(--border-color);
+      border-radius: 16px; padding: 20px; display: flex; flex-direction: column;
+    }
+    .pane-header { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    
+    textarea.demo-input {
+      width: 100%; flex-grow: 1; background: transparent; border: none; color: white;
+      font-family: 'Inter', sans-serif; font-size: 18px; resize: none; outline: none; min-height: 150px;
+    }
+    .demo-btn {
+      margin-top: 16px; background: #2563eb; color: white; border: none; padding: 14px;
+      border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .demo-btn:hover { background: #1d4ed8; }
+    .demo-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-    .primary-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 40px rgba(108, 92, 231, 0.5);
+    .output-pane { background: #0a0a0f; border-color: rgba(139, 92, 246, 0.3); }
+    .demo-output {
+      font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #e2e8f0;
+      white-space: pre-wrap; flex-grow: 1; overflow-y: auto; max-height: 300px;
+      line-height: 1.5;
     }
+    .demo-placeholder { color: var(--text-secondary); font-style: italic; }
 
-    .secondary-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      color: white;
-      text-decoration: none;
-      padding: 16px 32px;
-      border-radius: 30px;
-      font-weight: 600;
-      font-size: 18px;
-      transition: all 0.3s ease;
-    }
+    .features { padding: 100px 5%; background-color: var(--bg-secondary); margin-top: 100px; }
+    .section-header { text-align: center; margin-bottom: 60px; }
+    .section-header h2 { font-size: 40px; font-weight: 800; margin-bottom: 16px; }
+    
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+    .feature-card { background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 40px 30px; border-radius: 20px; transition: all 0.3s ease; }
+    .feature-card:hover { transform: translateY(-5px); border-color: var(--accent-primary); }
+    .feature-icon { font-size: 40px; margin-bottom: 24px; }
+    .feature-card h3 { font-size: 24px; margin-bottom: 16px; }
+    .feature-card p { color: var(--text-secondary); }
 
-    .secondary-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .platforms {
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-
-    .stats {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 60px;
-      margin-top: 60px;
-      padding-top: 40px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .stat-item h3 {
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--accent-secondary);
-    }
-
-    .stat-item p {
-      color: var(--text-secondary);
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .features {
-      padding: 100px 5%;
-      background-color: var(--bg-secondary);
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 60px;
-    }
-
-    .section-header h2 {
-      font-size: 40px;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
-
-    .section-header p {
-      font-size: 18px;
-      color: var(--text-secondary);
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .feature-card {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      padding: 40px 30px;
-      border-radius: 20px;
-      transition: all 0.3s ease;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-10px);
-      border-color: var(--accent-primary);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    .feature-icon {
-      font-size: 40px;
-      margin-bottom: 24px;
-      display: inline-block;
-      text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-    }
-
-    .feature-card h3 {
-      font-size: 24px;
-      margin-bottom: 16px;
-    }
-
-    .feature-card p {
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-    }
-
-    .feature-list {
-      list-style: none;
-    }
-
-    .feature-list li {
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--text-primary);
-    }
-
-    .feature-list li::before {
-      content: '✓';
-      color: var(--accent-secondary);
-      font-weight: bold;
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px;
-      border-top: 1px solid var(--border-color);
-      color: var(--text-secondary);
-    }
-
-    footer a {
-      color: var(--accent-secondary);
-      text-decoration: none;
-    }
+    footer { text-align: center; padding: 40px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+    
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
   <nav>
     <div class="logo">⚡ <span>PromptFlow Pro</span></div>
+    <div class="nav-links">
+      <a href="#demo">Live Demo</a>
+      <a href="#features">Features</a>
+    </div>
   </nav>
 
   <section class="hero">
-    <h1>Get Better AI Responses<br>in One Click</h1>
-    <p>PromptFlow Pro enhances your AI experience with powerful prompt engineering tools, a curated prompt library, and seamless conversation export across all major AI platforms.</p>
+    <div class="hero-badge">v3.0 The Prompt Translation Model</div>
+    <h1>Intent → <span>Structured AI Execution Engine</span></h1>
+    <p>Stop writing weak prompts. Type a raw, vague thought and our inline AI translates it into an elite, highly structured machine instruction instantly.</p>
     
     <div class="cta-buttons">
-      <a href="#" class="primary-btn">Add to Chrome</a>
-      <a href="#" class="secondary-btn">Watch Demo</a>
+      <a href="https://chromewebstore.google.com" target="_blank" class="primary-btn">Install Extension (Free)</a>
     </div>
     
-    <p class="platforms">Also available on Edge & Firefox</p>
-
-    <div class="stats">
-      <div class="stat-item">
-        <h3>4.5★</h3>
-        <p>Chrome Web Store</p>
-      </div>
-      <div class="stat-item">
-        <h3>10,000+</h3>
-        <p>Users</p>
-      </div>
-      <div class="stat-item">
-        <h3>100%</h3>
-        <p>Free</p>
+    <div id="demo" class="demo-section">
+      <div class="demo-title">✨ Try the Prompt Translation Model Live</div>
+      <div class="demo-container">
+        <div class="input-pane">
+          <div class="pane-header">Human Thought (Vague)</div>
+          <textarea id="demoInput" class="demo-input" placeholder="E.g., build a to do list app in react..."></textarea>
+          <button id="demoBtn" class="demo-btn">✨ Enhance Now</button>
+        </div>
+        <div class="output-pane">
+          <div class="pane-header">Machine Instruction (Elite)</div>
+          <div id="demoOutput" class="demo-output"><span class="demo-placeholder">Awaiting input...</span></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="features">
+  <section id="features" class="features">
     <div class="section-header">
-      <h2>How PromptFlow Pro Enhances Your Experience</h2>
-      <p>Everything you need to get the most out of AI, all in one extension.</p>
+      <h2>Supercharge Your AI Workflow</h2>
     </div>
-
     <div class="feature-grid">
-      
-      <!-- Feature 1 -->
       <div class="feature-card">
-        <div class="feature-icon">🛠️</div>
-        <h3>Prompt Engineering Tools</h3>
-        <p>Craft better prompts using our Chrome extension or API playground. Get instant suggestions and refinements powered by advanced prompt engineering techniques.</p>
-        <ul class="feature-list">
-          <li>One-click prompt enhancement</li>
-          <li>Custom prompt curation</li>
-          <li>Advanced AI techniques</li>
-        </ul>
+        <div class="feature-icon">🌐</div>
+        <h3>Works on Any Website</h3>
+        <p>Our magical "✨ Enhance" button injects natively into any text box on the internet. Use it on ChatGPT, Claude, GitHub, Reddit, or your own internal company tools without refreshing the page.</p>
       </div>
-
-      <!-- Feature 2 -->
       <div class="feature-card">
-        <div class="feature-icon">🗂️</div>
-        <h3>Prompt Library & Organization</h3>
-        <p>Access our daily-updated collection of engineered prompts, and organize your personal prompts in custom folders.</p>
-        <ul class="feature-list">
-          <li>Daily updated templates</li>
-          <li>Custom folders</li>
-          <li>Save & reuse favorites</li>
-        </ul>
+        <div class="feature-icon">🧠</div>
+        <h3>Strict Structured Framework</h3>
+        <p>Every enhanced prompt is strictly formatted using the elite [ROLE], [TASK], [CONTEXT], [REQUIREMENTS], and [OUTPUT FORMAT] framework for maximum AI compliance.</p>
       </div>
-
-      <!-- Feature 3 -->
       <div class="feature-card">
-        <div class="feature-icon">🔄</div>
-        <h3>Cross-Platform Chat Export</h3>
-        <p>Export conversations between ChatGPT, Claude, Perplexity, Gemini, and Deepseek with intelligent summaries.</p>
-        <ul class="feature-list">
-          <li>Seamless AI switching</li>
-          <li>Intelligent summaries</li>
-          <li>Bypass usage limits & track work in chat</li>
-        </ul>
+        <div class="feature-icon">🔒</div>
+        <h3>100% Free & Private</h3>
+        <p>No sign-ups. No paywalls. Your saved prompts are stored locally in Chrome's isolated storage. Our API routing ensures lighting-fast speed via Pollinations AI.</p>
       </div>
-
     </div>
   </section>
 
   <footer>
-    <p>&copy; 2026 PromptFlow Pro. View our <a href="privacy.html">Privacy Policy</a>.</p>
+    <p>&copy; 2026 PromptFlow Pro. View our <a href="privacy.html" style="color:#c084fc;">Privacy Policy</a>.</p>
   </footer>
 
+  <script>
+    const SYSTEM_PROMPT = `You are an elite Prompt Architect and Intent Translator.
+Your ONLY job is to transform raw, vague human thoughts into highly detailed, machine-optimized instructions using the exact template below.
+
+GOLDEN RULES FOR ENHANCEMENT:
+1. Detect Intent: Figure out what the user REALLY wants to achieve.
+2. Complete Missing Context: Auto-fill audience, platform, and constraints.
+3. Structure: You MUST format the final prompt using EXACTLY these section headers: [ROLE], [TASK], [CONTEXT], [REQUIREMENTS], [OUTPUT FORMAT], [STYLE].
+4. Return ONLY the enhanced prompt. No conversational text.
+
+FEW-SHOT EXAMPLES:
+
+User Input: "write email to boss for leave"
+Enhanced Output:
+[ROLE]
+Act as a professional corporate employee.
+
+[TASK]
+Write a polite and concise leave request email to my manager requesting 3 days of leave due to personal reasons.
+
+[CONTEXT]
+I am feeling unwell and will be offline for recovery, but reachable for absolute emergencies.
+
+[REQUIREMENTS]
+- Mention work handover
+- Include subject line
+- Keep under 150 words
+
+[OUTPUT FORMAT]
+Return plain text email format.
+
+[STYLE]
+Professional, short, and respectful.
+
+User Input: "give saas ideas"
+Enhanced Output:
+[ROLE]
+Act as a SaaS startup strategist with 15 years of experience.
+
+[TASK]
+Generate 10 profitable AI SaaS startup ideas for 2026.
+
+[CONTEXT]
+Targeting solo founders looking for high-margin, low-competition niches.
+
+[REQUIREMENTS]
+- Problem solved
+- Target audience
+- Revenue model
+- MVP features
+- Tech stack
+- Difficulty level
+
+[OUTPUT FORMAT]
+Return in a well-structured markdown table.
+
+[STYLE]
+Analytical, professional, and directly actionable.`;
+
+    const demoInput = document.getElementById('demoInput');
+    const demoBtn = document.getElementById('demoBtn');
+    const demoOutput = document.getElementById('demoOutput');
+
+    async function enhancePromptLive(text) {
+      demoBtn.disabled = true;
+      demoBtn.innerHTML = '<span class="spinner"></span> <span>Engineering...</span>';
+      demoOutput.innerHTML = '<span class="demo-placeholder" style="color:#8b5cf6;">Translating intent...</span>';
+      
+      try {
+        const response = await fetch('https://text.pollinations.ai/openai-fast', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              { role: 'system', content: SYSTEM_PROMPT },
+              { role: 'user', content: text }
+            ],
+            temperature: 0.5,
+            seed: Date.now()
+          })
+        });
+
+        if (!response.ok) {
+          if (response.status === 429) throw new Error("Queue Full. Pollinations is busy.");
+          throw new Error("API Error: " + response.status);
+        }
+
+        const data = await response.text();
+        // Remove markdown wrappers if any
+        let clean = data.trim();
+        if (clean.startsWith('```markdown')) clean = clean.substring(11);
+        else if (clean.startsWith('```text')) clean = clean.substring(7);
+        else if (clean.startsWith('```')) clean = clean.substring(3);
+        if (clean.endsWith('```')) clean = clean.substring(0, clean.length - 3);
+        clean = clean.trim();
+
+        demoOutput.innerHTML = clean.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      } catch (err) {
+        demoOutput.innerHTML = `<span style="color:#ef4444;">Error: ${err.message}. Please try again.</span>`;
+      } finally {
+        demoBtn.disabled = false;
+        demoBtn.innerHTML = '✨ Enhance Now';
+      }
+    }
+
+    demoBtn.addEventListener('click', () => {
+      const text = demoInput.value.trim();
+      if (!text) return;
+      enhancePromptLive(text);
+    });
+  </script>
 </body>
 </html>
