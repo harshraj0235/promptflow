@@ -11,7 +11,7 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://text.pollinations.ai/*",
+    "https://promptflow-proxy.harshraj0235.workers.dev/*",
     "*://chat.openai.com/*",
     "*://chatgpt.com/*",
     "*://claude.ai/*",

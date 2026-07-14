@@ -4,147 +4,126 @@
 
 /* Inline Button Container — Glass Pill */
 #pf-inline-btn-container {
-  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: linear-gradient(135deg, rgba(15, 15, 30, 0.92), rgba(25, 20, 50, 0.92));
-  backdrop-filter: blur(16px) saturate(1.8);
-  -webkit-backdrop-filter: blur(16px) saturate(1.8);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  border-radius: 50px;
-  padding: 4px 5px;
-  box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-    0 0 40px rgba(108, 92, 231, 0.08);
-  z-index: 2147483647;
-  position: fixed;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: pfSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-#pf-inline-btn-container:hover {
-  border-color: rgba(168, 85, 247, 0.5);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-    0 0 60px rgba(108, 92, 231, 0.15);
-  transform: translateY(-1px);
-}
-
-@keyframes pfSlideIn {
-  from { opacity: 0; transform: translateY(8px) scale(0.95); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* Save Button — Subtle ghost */
-.pf-inline-save-btn {
-  background: transparent;
-  color: rgba(200, 200, 220, 0.75);
-  border: none;
-  padding: 7px 14px;
-  border-radius: 50px;
-  font-size: 12.5px;
-  font-weight: 500;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: auto;
-  white-space: nowrap;
-  letter-spacing: 0.01em;
-}
-
-.pf-inline-save-btn:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.pf-inline-save-btn:active {
-  transform: scale(0.96);
-}
-
-/* Tone/Goal Selector */
-.pf-inline-tone-select {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(230, 230, 240, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.2s ease;
-  margin: 0 4px;
-}
-
-.pf-inline-tone-select:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(168, 85, 247, 0.4);
-}
-
-.pf-inline-tone-select:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
-}
-
-.pf-inline-tone-select option {
-  background: #1e1e2e;
-  color: #fff;
-}
-
-/* Enhance Button — Premium gradient with glow */
-.pf-inline-enhance-btn {
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #6d28d9 100%);
-  color: white;
-  border: none;
-  padding: 7px 16px;
-  border-radius: 50px;
-  font-size: 12.5px;
-  font-weight: 600;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  cursor: pointer;
+  font-family: 'Inter', -apple-system, sans-serif;
   display: flex;
   align-items: center;
   gap: 6px;
-  box-shadow:
-    0 2px 12px rgba(168, 85, 247, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(65, 65, 70, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 4px 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 2147483647;
+  position: fixed;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: pfSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  height: 32px;
+  box-sizing: border-box;
+}
+
+#pf-inline-btn-container:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes pfSlideIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Save Button — Ghost */
+.pf-inline-save-btn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: 'Inter', -apple-system, sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
   pointer-events: auto;
   white-space: nowrap;
-  letter-spacing: 0.02em;
-  position: relative;
-  overflow: hidden;
 }
 
-.pf-inline-enhance-btn::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-  transition: left 0.5s ease;
+.pf-inline-save-btn:hover {
+  color: rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.02);
 }
 
-.pf-inline-enhance-btn:hover::before {
-  left: 100%;
+.pf-inline-save-btn:active {
+  transform: scale(0.98);
+}
+
+/* Tone/Goal Selector — Outline */
+.pf-inline-tone-select {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: 'Inter', -apple-system, sans-serif;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+  margin: 0;
+  appearance: none;
+  text-align: center;
+}
+
+.pf-inline-tone-select:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.02);
+}
+
+.pf-inline-tone-select:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.pf-inline-tone-select option {
+  background: #2a2a2e;
+  color: #fff;
+}
+
+/* Enhance Button — Outline (Context-Aware) */
+.pf-inline-enhance-btn {
+  background: rgba(168, 85, 247, 0.12);
+  color: #d8b4fe;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: 'Inter', -apple-system, sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  pointer-events: auto;
+  white-space: nowrap;
 }
 
 .pf-inline-enhance-btn:hover {
-  transform: translateY(-1px) scale(1.03);
-  box-shadow:
-    0 4px 20px rgba(168, 85, 247, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
-  background: linear-gradient(135deg, #b66dfa 0%, #8b5cf6 50%, #7c3aed 100%);
+  background: rgba(168, 85, 247, 0.25);
+  border-color: rgba(168, 85, 247, 0.6);
+  color: #f3e8ff;
+  transform: scale(1.02);
 }
 
 .pf-inline-enhance-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 /* Loading State — Animated pulse with progress bar */

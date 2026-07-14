@@ -66,93 +66,93 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 // Merged Intent Detection + Engineering + Scoring into ONE call
 // ═══════════════════════════════════════════════════════════════
 
-const CRAFTED_SYSTEM = `You are an elite Prompt Architect and Intent Translator.
-Your ONLY job is to transform raw, vague human thoughts into highly detailed, machine-optimized instructions using the exact template below.
+const CRAFTED_SYSTEM = `You are an expert Prompt Engineer and AI Assistant. Your goal is to take the user's raw, vague input and transform it into a highly effective, structured prompt using "The Core Formula".
 
-GOLDEN RULES FOR ENHANCEMENT:
-1. Detect Intent: Figure out what the user REALLY wants to achieve.
-2. Complete Missing Context: Auto-fill audience, platform, and constraints.
-3. Structure: You MUST format the final prompt using EXACTLY these section headers: [ROLE], [TASK], [CONTEXT], [REQUIREMENTS], [OUTPUT FORMAT], [STYLE].
-4. Return ONLY the enhanced prompt. No conversational text.
+Writing better prompts is mostly about reducing ambiguity and giving the AI enough context to produce the result the user actually wants. A useful way to think about prompting is that you're writing a specification rather than asking a casual question.
 
-FEW-SHOT EXAMPLES:
+### THE CORE FORMULA
+You must output the final prompt strictly following this structure:
 
-User Input: "write email to boss for leave"
-Enhanced Output:
-[ROLE]
-Act as a professional corporate employee.
+Role:
+You are an expert in [domain].
 
-[TASK]
-Write a polite and concise leave request email to my manager requesting 3 days of leave due to personal reasons.
+Objective:
+Help me achieve [goal].
 
-[CONTEXT]
-I am feeling unwell and will be offline for recovery, but reachable for absolute emergencies.
+Context:
+[Relevant background and details.]
 
-[REQUIREMENTS]
-- Mention work handover
-- Include subject line
-- Keep under 150 words
+Task:
+Complete the following:
+1. ...
+2. ...
+3. ...
 
-[OUTPUT FORMAT]
-Return plain text email format.
+Requirements:
+- Be accurate.
+- Explain step by step.
+- Use examples where helpful.
+- Mention assumptions if information is missing.
 
-[STYLE]
-Professional, short, and respectful.
+Constraints:
+- Tone: [formal/friendly/etc.]
+- Length: [e.g., 800–1200 words]
+- Avoid: [jargon, repetition, unsupported claims]
 
-User Input: "make login page in react"
-Enhanced Output:
-[ROLE]
-Act as a senior frontend developer.
+Output Format:
+- [Describe the format, e.g., Executive summary, Main explanation, Examples]
 
-[TASK]
-Create a modern responsive login page using React and Tailwind CSS.
+### GOLDEN RULES
+1. Analyze the user's input inside <thinking> tags first. Identify missing information (Role, Context, Constraints) and auto-fill them logically.
+2. Formulate the final, highly structured prompt inside <final_prompt> tags.
+3. The final prompt should use markdown or clear spacing. Do NOT wrap the final prompt in a markdown code block (\`\`\`) unless the user specifically asked for code.
 
-[CONTEXT]
-Targeting a SaaS web application that needs a clean, modern aesthetic.
+### FEW-SHOT EXAMPLES (Internal Reasoning)
+<example>
+User Input: write about AI
 
-[REQUIREMENTS]
-- Email and password fields
-- Show/hide password toggle
-- Form validation
-- Mobile responsive
-- Dark mode support
-- Use functional components
-- Include complete code
-- Add comments for beginners
+<thinking>
+1. Goal: Write a guide about AI. (The input is too weak).
+2. Context: The user needs a beginner-friendly explanation.
+3. Role: Tech Educator.
+4. Task: Explain how AI works, step-by-step.
+5. Constraints: Keep it under 500 words, simple English, no jargon.
+6. Output Format: Markdown with headings and bullet points.
+</thinking>
+<final_prompt>
+Role:
+You are an expert Tech Educator.
 
-[OUTPUT FORMAT]
-Return standard markdown code blocks.
+Objective:
+Help me understand artificial intelligence.
 
-[STYLE]
-Clean modern UI design, production-ready code.
+Context:
+I am a beginner with no technical background. I need to understand the basics of AI, how it works, and its common applications.
 
-User Input: "give saas ideas"
-Enhanced Output:
-[ROLE]
-Act as a SaaS startup strategist with 15 years of experience.
+Task:
+Complete the following:
+1. Explain what AI is in simple terms.
+2. Describe how AI learns (briefly mention machine learning).
+3. Provide 3 everyday examples of AI.
 
-[TASK]
-Generate 10 profitable AI SaaS startup ideas for 2026.
+Requirements:
+- Be accurate but accessible.
+- Explain step by step.
+- Use analogies where helpful.
 
-[CONTEXT]
-Targeting solo founders looking for high-margin, low-competition niches.
+Constraints:
+- Tone: Friendly and educational.
+- Length: Under 500 words.
+- Avoid: Technical jargon and complex math.
 
-[REQUIREMENTS]
-- Problem solved
-- Target audience
-- Revenue model
-- MVP features
-- Tech stack
-- Marketing strategy
-- Difficulty level
-- Competition analysis
-- Estimated monthly income potential
-
-[OUTPUT FORMAT]
-Return in a well-structured markdown table.
-
-[STYLE]
-Analytical, professional, and directly actionable.`;
+Output Format:
+- Title
+- Introduction
+- How it Works (Bullet points)
+- Everyday Examples
+- Summary
+</final_prompt>
+</example>`;
 
 function buildSystemPrompt(tone, settings = {}) {
   let prompt = CRAFTED_SYSTEM;
@@ -175,49 +175,34 @@ function buildSystemPrompt(tone, settings = {}) {
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // ═══════════════════════════════════════════════════════════════
-// FAST POST — Primary method via OpenAI-compatible endpoint
+// OPENROUTER API INTEGRATION
 // ═══════════════════════════════════════════════════════════════
-async function callPollinationsPOST(text, systemPrompt) {
-  const res = await fetch('https://text.pollinations.ai/openai/v1/chat/completions', {
+async function callOpenRouter(text, systemPrompt) {
+  // We now route through the secure Cloudflare Proxy instead of directly to OpenRouter.
+  // The API key is safely hidden inside the Cloudflare environment variables!
+  const res = await fetch('https://promptflow-proxy.harshraj0235.workers.dev', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({
-      model: 'openai-fast',
+      model: 'openai/gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: text }
       ],
-      max_tokens: 1000,
-      temperature: 0.6
+      temperature: 0.5
     })
   });
 
   if (!res.ok) {
     const errBody = await res.text().catch(() => '');
-    throw new Error(`POST ${res.status}: ${errBody.substring(0, 120)}`);
+    throw new Error(`OpenRouter API Error ${res.status}: ${errBody.substring(0, 120)}`);
   }
 
   const data = await res.json();
-  if (!data.choices?.[0]?.message) throw new Error('Invalid POST response');
+  if (!data.choices?.[0]?.message) throw new Error('Invalid OpenRouter response');
   return data.choices[0].message.content.trim();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// FAST GET — Fallback method via simple GET endpoint
-// ═══════════════════════════════════════════════════════════════
-async function callPollinationsGET(text, systemPrompt) {
-  const fullPrompt = systemPrompt + '\n\nUser input to enhance:\n' + text;
-  const encoded = encodeURIComponent(fullPrompt);
-  const url = `https://text.pollinations.ai/${encoded}?model=openai-fast&noCache=true`;
-  
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`GET ${res.status}`);
-  }
-  
-  const result = await res.text();
-  if (!result || result.length < 10) throw new Error('Empty GET response');
-  return result.trim();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -225,6 +210,15 @@ async function callPollinationsGET(text, systemPrompt) {
 // ═══════════════════════════════════════════════════════════════
 
 function cleanText(raw) {
+  // Extract content from <final_prompt> tags if they exist
+  const match = raw.match(/<final_prompt>([\s\S]*?)<\/final_prompt>/i);
+  if (match && match[1]) {
+    raw = match[1];
+  } else {
+    // Fallback: remove <thinking> block if it exists
+    raw = raw.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '');
+  }
+
   return raw
     .replace(/^[\s]*(Here(?:'s| is) (?:the |your )?(enhanced|improved|optimized|rewritten|expanded) prompt:?[\s]*)/i, '')
     .replace(/^[\s]*\**Enhanced Prompt:?\**[\s]*/i, '')
@@ -239,51 +233,23 @@ function cleanText(raw) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MAIN ENHANCE — Single Pass + Auto-Fallback (POST → GET)
+// MAIN ENHANCE — Calling OpenRouter
 // ═══════════════════════════════════════════════════════════════
 
 async function enhancePrompt(text, tone, settings) {
   const startTime = Date.now();
   const systemPrompt = buildSystemPrompt(tone, settings);
-  const errors = [];
 
-  // Strategy 1: POST endpoint (primary, most reliable)
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      console.log(`PromptFlow: POST attempt ${attempt + 1}...`);
-      const result = await callPollinationsPOST(text, systemPrompt);
-      const elapsed = Date.now() - startTime;
-      console.log(`PromptFlow: Success via POST in ${elapsed}ms`);
-      return { text: cleanText(result), provider: 'Pollinations AI', time: elapsed };
-    } catch (e) {
-      errors.push(`POST#${attempt + 1}: ${e.message}`);
-      console.warn(`PromptFlow: POST attempt ${attempt + 1} failed —`, e.message);
-      
-      // If Queue is full, use exponential backoff
-      if (e.message.includes('429') || e.message.includes('Queue full')) {
-        const backoff = (attempt + 1) * 3500; // 3.5s, then 7s
-        console.log(`PromptFlow: Rate limited. Waiting ${backoff}ms...`);
-        await delay(backoff);
-      } else {
-        await delay(1000);
-      }
-    }
-  }
-
-  // Strategy 2: GET endpoint (fallback)
   try {
-    console.log('PromptFlow: Falling back to GET endpoint...');
-    await delay(2000); // Wait slightly before hitting GET to let queues clear
-    const result = await callPollinationsGET(text, systemPrompt);
+    console.log(`PromptFlow: Requesting OpenRouter...`);
+    const result = await callOpenRouter(text, systemPrompt);
     const elapsed = Date.now() - startTime;
-    console.log(`PromptFlow: Success via GET fallback in ${elapsed}ms`);
-    return { text: cleanText(result), provider: 'Pollinations AI (GET)', time: elapsed };
+    console.log(`PromptFlow: Success in ${elapsed}ms`);
+    return { text: cleanText(result), provider: 'OpenRouter AI', time: elapsed };
   } catch (e) {
-    errors.push(`GET: ${e.message}`);
-    console.warn('PromptFlow: GET fallback also failed —', e.message);
+    console.error(`PromptFlow: Error —`, e.message);
+    return { error: 'API_ERROR', rawError: e.message };
   }
-
-  return { error: 'QUEUE_FULL', rawError: errors.join(' | ') };
 }
 
 // ═══════════════════════════════════════════════════════════════

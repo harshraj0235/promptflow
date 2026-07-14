@@ -279,9 +279,9 @@ function updateButtonPosition() {
   btnContainer.style.display = 'flex';
 
   // Position overlapping the top-right corner of the input
-  const btnWidth = 230;
+  const btnWidth = 200; // Adjusted for smaller toolbar
   let left = rect.right - btnWidth - 8;
-  let top = rect.top - 20;
+  let top = rect.top - 38; // Places it entirely above the input, not overlapping text
 
   // Keep within viewport
   if (left < 8) left = 8;
