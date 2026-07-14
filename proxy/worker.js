@@ -26,6 +26,13 @@ export default {
       // Parse the incoming JSON payload from the Chrome Extension
       const body = await request.json();
 
+      if (!env.OPENROUTER_API_KEY) {
+        return new Response(JSON.stringify({ error: "The Cloudflare Worker cannot find the OPENROUTER_API_KEY environment variable. It evaluates to undefined." }), {
+          status: 500,
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
+
       // 3. Forward the request to OpenRouter securely
       const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
